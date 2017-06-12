@@ -1,0 +1,29 @@
+{
+    "name": "vainyl/doctrine-odm-bridge",
+    "type": "shared-package",
+    "authors": [
+        {
+            "name": "Taras Girnyk",
+            "email": "taras.p.gyrnik@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Vainyl\\Doctrine\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.1",
+        "vainyl/core": "dev-master",
+        "vainyl/database": "dev-master",
+        "vainyl/time": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://satis.vainyl.com:444"
+        }
+    ],
+    "prefer-stable": true,
+    "minimum-stability": "dev"
+}
