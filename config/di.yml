@@ -1,0 +1,18 @@
+services:
+  doctrine.document.manager:
+    class: Vainyl\Doctrine\ODM\DoctrineDocumentManager
+  doctrine.document.manager.factory:
+    class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentManagerFactory
+  doctrine.documen.manager.configuration:
+    class: Doctrine\ODM\MongoDB\Configuration
+  doctrine.document.manager.configuration.factory:
+    class: Vainyl\Doctrine\ODM\Factory\DoctrineConfigurationFactory
+    arguments: ['@extension.storage']
+  operation.sequence.factory.document:
+    decorates: operation.sequence.factory
+    decoration_priority: 500
+    class: Vainyl\Doctrine\ODM\Operation\Decorator\DoctrineCollectionFactoryDecorator
+    arguments: ['@operation.sequence.factory.document', '@doctrine.document.manager']
+  document.hydrator.doctrine:
+    class: Vainyl\Doctrine\ODM\Hydrator\DoctrineDocumentHydrator
+  document.operation.factory.doctrine:
