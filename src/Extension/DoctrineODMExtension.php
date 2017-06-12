@@ -15,10 +15,10 @@ namespace Vainyl\Doctrine\ODM\Extension;
 use Vainyl\Core\Extension\AbstractExtension;
 
 /**
- * Class DoctrineExtension
+ * Class DoctrineODMExtension
  *
  * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
-class DoctrineExtension extends AbstractExtension
+class DoctrineODMExtension extends AbstractExtension
 {
 }
