@@ -9,7 +9,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Vainyl\\Doctrine\\": "src/"
+            "Vainyl\\Doctrine\\ODM": "src/"
         }
     },
     "require": {
