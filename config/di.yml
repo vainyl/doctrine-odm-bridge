@@ -32,3 +32,4 @@ services:
   document.operation.factory.doctrine:
     class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
     arguments: ['@collection.factory.sequence', '@doctrine.document.manager']
+  document.operation.factory: '@document.operation.factory.doctrine'
