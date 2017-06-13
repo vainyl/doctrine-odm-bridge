@@ -1,18 +1,34 @@
+parameters:
+  doctrine.odm.map.file: 'entitymap'
+  doctrine.odm.map.extension: '.odm.yml'
+
 services:
+  doctrine.configuration.odm:
+    class: Doctrine\ODM\MongoDB\Configuration
+    factory: ['@doctrine.configuration.factory.orm', 'getConfiguration']
+    arguments:
+      - '@doctrine.cache'
+      - '@app.environment'
+      - '%doctrine.document.map.file%'
+      - '%doctrine.document.map.extension%'
+  doctrine.configuration.factory.odm:
+    class: Vainyl\Doctrine\ODM\Factory\DoctrineConfigurationFactory
+    arguments: ['@extension.stoarge']
   doctrine.document.manager:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentManager
+    factory: ['@doctrine.document.manager.factory', 'create']
+    arguments:
+      - '@database.doctrine'
+      - '@doctrine.configuration.odm'
+      - '@doctrine.event.manager'
+      - '@time.factory'
   doctrine.document.manager.factory:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentManagerFactory
-  doctrine.documen.manager.configuration:
-    class: Doctrine\ODM\MongoDB\Configuration
-  doctrine.document.manager.configuration.factory:
-    class: Vainyl\Doctrine\ODM\Factory\DoctrineConfigurationFactory
-    arguments: ['@extension.storage']
-  operation.sequence.factory.document:
-    decorates: operation.sequence.factory
+  collection.factory.sequence.document:
+    decorates: collection.factory.sequence
     decoration_priority: 500
     class: Vainyl\Doctrine\ODM\Operation\Decorator\DoctrineCollectionFactoryDecorator
-    arguments: ['@operation.sequence.factory.document.inner', '@doctrine.document.manager']
-  document.hydrator.doctrine:
-    class: Vainyl\Doctrine\ODM\Hydrator\DoctrineDocumentHydrator
+    arguments: ['@collection.factory.sequence.document.inner', '@doctrine.document.manager']
   document.operation.factory.doctrine:
+    class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
+    arguments: ['@collection.factory.sequence', '@doctrine.document.manager']

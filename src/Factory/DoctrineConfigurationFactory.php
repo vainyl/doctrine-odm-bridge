@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace Vainyl\Doctrine\ODM\Factory;
 
-use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\Common\Cache\Cache as DoctrineCacheInterface;
+use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\Mapping\Driver\SimplifiedYamlDriver;
 use Vainyl\Core\Application\EnvironmentInterface;
 use Vainyl\Core\Extension\AbstractExtension;
@@ -40,23 +40,18 @@ class DoctrineConfigurationFactory
 
     /**
      * @param DoctrineCacheInterface $doctrineCache
-     * @param EnvironmentInterface                 $environment
-     * @param string                 $configDir
-     * @param string                 $cacheDir
+     * @param EnvironmentInterface   $environment
      * @param string                 $globalFileName
-     * @param string                 $extension
+     * @param string                 $fileExtension
      *
      * @return Configuration
      */
     public function getConfiguration(
         DoctrineCacheInterface $doctrineCache,
         EnvironmentInterface $environment,
-        string $configDir,
-        string $cacheDir,
         string $globalFileName,
-        string $extension
-    ) : Configuration
-    {
+        string $fileExtension
+    ): Configuration {
         $paths = [];
         /**
          * @var AbstractExtension $extension
@@ -64,15 +59,15 @@ class DoctrineConfigurationFactory
         foreach ($this->extensionStorage->getIterator() as $extension) {
             $paths[$extension->getConfigDirectory($environment)] = $extension->getNamespace();
         }
-        $paths[$configDir] = '';
+        $paths[$environment->getConfigDirectory()] = '';
 
-        $driver = new SimplifiedYamlDriver($paths, $extension);
+        $driver = new SimplifiedYamlDriver($paths, $fileExtension);
         $driver->setGlobalBasename($globalFileName);
 
         $config = new Configuration();
-        $config->setProxyDir($cacheDir.'/proxies');
+        $config->setProxyDir($environment->getCacheDirectory() . DIRECTORY_SEPARATOR . 'proxies');
         $config->setProxyNamespace('Proxies');
-        $config->setHydratorDir($cacheDir.'/hydrators');
+        $config->setHydratorDir($environment->getCacheDirectory() . DIRECTORY_SEPARATOR . 'proxies');
         $config->setHydratorNamespace('Hydrators');
         $config->setMetadataDriverImpl($driver);
         $config->setMetadataCacheImpl($doctrineCache);
