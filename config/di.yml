@@ -12,7 +12,7 @@ services:
     decorates: operation.sequence.factory
     decoration_priority: 500
     class: Vainyl\Doctrine\ODM\Operation\Decorator\DoctrineCollectionFactoryDecorator
-    arguments: ['@operation.sequence.factory.document', '@doctrine.document.manager']
+    arguments: ['@operation.sequence.factory.document.inner', '@doctrine.document.manager']
   document.hydrator.doctrine:
     class: Vainyl\Doctrine\ODM\Hydrator\DoctrineDocumentHydrator
   document.operation.factory.doctrine:
