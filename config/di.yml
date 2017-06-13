@@ -7,7 +7,7 @@ services:
     class: Doctrine\ODM\MongoDB\Configuration
     factory: ['@doctrine.configuration.factory.orm', 'getConfiguration']
     arguments:
-      - '@doctrine.cache'
+      - '@doctrine.cache.apcu'
       - '@app.environment'
       - '%doctrine.document.map.file%'
       - '%doctrine.document.map.extension%'
