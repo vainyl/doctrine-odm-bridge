@@ -1,6 +1,6 @@
 parameters:
-  doctrine.odm.map.file: 'entitymap'
-  doctrine.odm.map.extension: '.odm.yml'
+  doctrine.document.map.file: 'entitymap'
+  doctrine.document.map.extension: '.odm.yml'
 
 services:
   doctrine.configuration.odm:
