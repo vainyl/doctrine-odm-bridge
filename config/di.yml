@@ -18,7 +18,7 @@ services:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentManager
     factory: ['@doctrine.document.manager.factory', 'create']
     arguments:
-      - '@database.document'
+      - '@database.doctrine.document'
       - '@doctrine.configuration.odm'
       - '@doctrine.event.manager'
       - '@time.factory'
