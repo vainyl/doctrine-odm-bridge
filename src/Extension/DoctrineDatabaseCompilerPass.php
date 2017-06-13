@@ -35,6 +35,7 @@ class DoctrineDatabaseCompilerPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('database.document');
         if ($definition->isSynthetic()) {
+            $container->removeDefinition('database.document');
             $container->setAlias('database.document', new Alias('database.document.doctrine'));
         }
 
