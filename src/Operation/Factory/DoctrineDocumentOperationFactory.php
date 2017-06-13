@@ -20,7 +20,7 @@ use Vainyl\Doctrine\ODM\Operation\UpdateDoctrineDocumentOperation;
 use Vainyl\Doctrine\ODM\Operation\UpsertDoctrineDocumentOperation;
 use Vainyl\Document\DocumentInterface;
 use Vainyl\Document\Operation\Factory\DocumentOperationFactoryInterface;
-use Vainyl\Operation\Collection\Factory\OperationFactoryInterface;
+use Vainyl\Operation\Factory\OperationFactoryInterface;
 use Vainyl\Operation\OperationInterface;
 
 /**
