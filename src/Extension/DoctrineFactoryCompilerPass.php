@@ -35,7 +35,7 @@ class DoctrineFactoryCompilerPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('document.operation.factory.doctrine');
         if ($definition->isSynthetic()) {
-            $container->set('document.operation.factory', new Alias('document.operation.factory.doctrine'));
+            $container->setAlias('document.operation.factory', new Alias('document.operation.factory.doctrine'));
         }
 
         return $this;
