@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace Vainyl\Doctrine\ODM\Extension;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Vainyl\Core\Application\EnvironmentInterface;
 use Vainyl\Core\Extension\AbstractExtension;
 
 /**
@@ -23,17 +21,4 @@ use Vainyl\Core\Extension\AbstractExtension;
  */
 class DoctrineODMExtension extends AbstractExtension
 {
-    /**
-     * @inheritDoc
-     */
-    public function load(
-        array $configs,
-        ContainerBuilder $container,
-        EnvironmentInterface $environment = null
-    ): AbstractExtension {
-        $container->addCompilerPass(new DoctrineDatabaseCompilerPass())
-                  ->addCompilerPass(new DoctrineFactoryCompilerPass());
-
-        return parent::load($configs, $container, $environment);
-    }
 }
