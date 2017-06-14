@@ -5,7 +5,7 @@ parameters:
 services:
   doctrine.configuration.odm:
     class: Doctrine\ODM\MongoDB\Configuration
-    factory: ['@doctrine.configuration.factory.orm', 'getConfiguration']
+    factory: ['@doctrine.configuration.factory.odm', 'getConfiguration']
     arguments:
       - '@doctrine.cache.apcu'
       - '@app.environment'
