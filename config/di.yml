@@ -32,3 +32,11 @@ services:
   document.operation.factory.doctrine:
     class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
     arguments: ['@collection.factory.sequence', '@doctrine.document.manager']
+  app.bootstrapper.doctrine.odm.annotation:
+    class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineAnnotationBootstrapper
+    tags:
+      - {name: 'bootstrapper'}
+  app.bootstrapper.doctrine.odm.type:
+    class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineTypeBootstrapper
+    tags:
+      - {name: 'bootstrapper'}
