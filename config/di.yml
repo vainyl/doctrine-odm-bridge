@@ -38,5 +38,6 @@ services:
       - {name: 'bootstrapper'}
   app.bootstrapper.doctrine.odm.type:
     class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineTypeBootstrapper
+    arguments: ['@time.factory']
     tags:
       - {name: 'bootstrapper'}
