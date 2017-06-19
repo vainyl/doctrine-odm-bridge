@@ -41,9 +41,6 @@ services:
     arguments: ['@time.factory']
     tags:
       - {name: 'bootstrapper'}
-  connection.factory.doctrine.odm:
-    class: Vainyl\Doctrine\ODM\Factory\DoctrineODMConnectionFactory
-    arguments: ['@connection.storage']
   database.factory.doctrine.odm:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineODMDatabaseFactory
     arguments: ['@connection.storage', '@doctrine.event.manager']
