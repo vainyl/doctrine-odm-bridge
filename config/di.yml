@@ -1,7 +1,3 @@
-parameters:
-  doctrine.document.map.file: 'entitymap'
-  doctrine.document.map.extension: '.odm.yml'
-
 services:
   doctrine.configuration.odm:
     class: Doctrine\ODM\MongoDB\Configuration
@@ -9,8 +5,7 @@ services:
     arguments:
       - '@doctrine.cache.apcu'
       - '@app.environment'
-      - '%doctrine.document.map.file%'
-      - '%doctrine.document.map.extension%'
+      - 'doctrine'
       - 'yaml'
       - 'entitymap'
       - '.odm.yml'
