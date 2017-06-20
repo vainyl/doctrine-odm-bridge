@@ -39,13 +39,13 @@ class DoctrineODMExtension extends AbstractFrameworkExtension
         $ormConfig = $this->processConfiguration($configuration, $configs);
 
         $definition = $container->getDefinition('doctrine.configuration.odm');
-        $definition->replaceArgument(2, $ormConfig['orm']['database']);
-        $definition->replaceArgument(3, $ormConfig['orm']['config']);
-        $definition->replaceArgument(4, $ormConfig['orm']['file']);
-        $definition->replaceArgument(5, $ormConfig['orm']['extension']);
-        $definition->replaceArgument(6, $ormConfig['orm']['tmp_dir']);
-        $definition->replaceArgument(7, $ormConfig['orm']['proxy']);
-        $definition->replaceArgument(8, $ormConfig['orm']['hydrator']);
+        $definition->replaceArgument(2, $ormConfig['database']);
+        $definition->replaceArgument(3, $ormConfig['config']);
+        $definition->replaceArgument(4, $ormConfig['file']);
+        $definition->replaceArgument(5, $ormConfig['extension']);
+        $definition->replaceArgument(6, $ormConfig['tmp_dir']);
+        $definition->replaceArgument(7, $ormConfig['proxy']);
+        $definition->replaceArgument(8, $ormConfig['hydrator']);
 
         return $this;
     }
