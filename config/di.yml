@@ -11,8 +11,14 @@ services:
       - '@app.environment'
       - '%doctrine.document.map.file%'
       - '%doctrine.document.map.extension%'
+      - 'yaml'
+      - 'entitymap'
+      - '.odm.yml'
+      - 'doctrine'
+      - 'Proxy'
+      - 'Hydrator'
   doctrine.configuration.factory.odm:
-    class: Vainyl\Doctrine\ODM\Factory\DoctrineConfigurationFactory
+    class: Vainyl\Doctrine\ODM\Factory\DoctrineODMConfigurationFactory
     arguments: ['@extension.storage']
   doctrine.document.manager:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentManager
