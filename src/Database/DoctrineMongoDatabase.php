@@ -51,7 +51,7 @@ class DoctrineMongoDatabase extends Connection implements DatabaseInterface
     /**
      * @inheritDoc
      */
-    public function runQuery($query, array $bindParams, array $bindTypes = []): CursorInterface
+    public function runQuery($query, array $bindParams = [], array $bindTypes = []): CursorInterface
     {
         trigger_error('Method runQuery is not implemented', E_USER_ERROR);
 
