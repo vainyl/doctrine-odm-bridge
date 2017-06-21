@@ -84,7 +84,7 @@ class DoctrineDocumentManager extends DocumentManager
     /**
      * @inheritDoc
      */
-    public function flush($entity = null, array $options = null)
+    public function flush($entity = null, array $options = [])
     {
         $this->flushLevel--;
 
