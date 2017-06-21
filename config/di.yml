@@ -3,7 +3,7 @@ services:
     class: Doctrine\ODM\MongoDB\Configuration
     factory: ['@doctrine.configuration.factory.odm', 'getConfiguration']
     arguments:
-      - '@doctrine.cache.apcu'
+      - '@doctrine.cache'
       - '@app.environment'
       - 'doctrine'
       - 'yaml'
