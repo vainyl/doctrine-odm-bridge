@@ -15,6 +15,9 @@ services:
   doctrine.configuration.factory.odm:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineODMConfigurationFactory
     arguments: ['@extension.storage']
+  doctrine.document.hydrator:
+    class: Vainyl\Doctrine\ODM\Hydrator\DoctrineDocumentHydrator
+    arguments: ['@doctrine.document.manager']
   doctrine.document.manager:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentManager
     factory: ['@doctrine.document.manager.factory', 'create']

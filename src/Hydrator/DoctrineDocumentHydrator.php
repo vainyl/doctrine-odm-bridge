@@ -15,13 +15,15 @@ namespace Vainyl\Doctrine\ODM\Hydrator;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo as ClassMetadata;
+use Vainyl\Document\DocumentInterface;
+use Vainyl\Document\Hydrator\DocumentHydratorInterface;
 
 /**
  * Class DoctrineDocumentHydrator
  *
  * @author Nazar Ivanenko <nivanenko@gmail.com>
  */
-class DoctrineDocumentHydrator implements DocumentFactoryInterface
+class DoctrineDocumentHydrator implements DocumentHydratorInterface
 {
     private $documentManager;
 
@@ -48,7 +50,7 @@ class DoctrineDocumentHydrator implements DocumentFactoryInterface
     /**
      * @inheritDoc
      */
-    public function createDocument(string $documentName, array $documentData): DocumentInterface
+    public function create(string $documentName, array $documentData): DocumentInterface
     {
         $class = $this->documentManager->getClassMetadata($documentName);
 
