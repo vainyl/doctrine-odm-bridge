@@ -51,9 +51,9 @@ class DoctrineDocumentHydrator extends AbstractIdentifiable implements DocumentH
     /**
      * @inheritDoc
      */
-    public function create(string $documentName, array $documentData): DocumentInterface
+    public function hydrate(string $name, array $documentData): DocumentInterface
     {
-        $class = $this->documentManager->getClassMetadata($documentName);
+        $class = $this->documentManager->getClassMetadata($name);
 
         $discriminatorValue = null;
         if (isset($class->discriminatorField, $data[$class->discriminatorField])) {
