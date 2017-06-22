@@ -15,6 +15,7 @@ namespace Vainyl\Doctrine\ODM;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo as ClassMetadata;
+use Vainyl\Core\AbstractIdentifiable;
 use Vainyl\Document\DocumentInterface;
 use Vainyl\Document\Hydrator\DocumentHydratorInterface;
 
@@ -23,7 +24,7 @@ use Vainyl\Document\Hydrator\DocumentHydratorInterface;
  *
  * @author Nazar Ivanenko <nivanenko@gmail.com>
  */
-class DoctrineDocumentHydrator implements DocumentHydratorInterface
+class DoctrineDocumentHydrator extends AbstractIdentifiable implements DocumentHydratorInterface
 {
     private $documentManager;
 
