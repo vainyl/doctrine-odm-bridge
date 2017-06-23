@@ -12,9 +12,11 @@ declare(strict_types=1);
 
 namespace Vainyl\Doctrine\ODM\Bootstrapper;
 
+use Doctrine\ODM\MongoDB\Types\Type;
 use Vainyl\Core\AbstractIdentifiable;
 use Vainyl\Core\Application\ApplicationInterface;
 use Vainyl\Core\Application\BootstrapperInterface;
+use Vainyl\Doctrine\ODM\Type\TimeType;
 use Vainyl\Time\Factory\TimeFactoryInterface;
 
 /**
@@ -49,6 +51,9 @@ class DoctrineTypeBootstrapper extends AbstractIdentifiable implements Bootstrap
      */
     public function process(ApplicationInterface $application): BootstrapperInterface
     {
+        Type::addType('v_time', TimeType::class);
+        Type::getType('v_time')->setTimeFactory($this->timeFactory);
+
         return $this;
     }
 }
