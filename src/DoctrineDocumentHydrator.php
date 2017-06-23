@@ -12,8 +12,9 @@ declare(strict_types=1);
 
 namespace Vainyl\Doctrine\ODM;
 
-use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo as ClassMetadata;
+use Doctrine\Common\Persistence\ManagerRegistry as DoctrineRegistryInterface;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadataFactory;
+use Doctrine\ODM\MongoDB\Mapping\MappingException;
 use Vainyl\Core\ArrayInterface;
 use Vainyl\Core\Hydrator\AbstractHydrator;
 use Vainyl\Core\Hydrator\HydratorInterface;
@@ -25,26 +26,20 @@ use Vainyl\Core\Hydrator\HydratorInterface;
  */
 class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInterface
 {
-    private $documentManager;
+    private $metadataFactory;
+
+    private $doctrineRegistry;
 
     /**
      * DoctrineDocumentHydrator constructor.
      *
-     * @param DocumentManager $documentManager
+     * @param ClassMetadataFactory      $metadataFactory
+     * @param DoctrineRegistryInterface $doctrineRegistry
      */
-    public function __construct(DocumentManager $documentManager)
+    public function __construct(ClassMetadataFactory $metadataFactory, DoctrineRegistryInterface $doctrineRegistry)
     {
-        $this->documentManager = $documentManager;
-    }
-
-    /**
-     * @param string $documentName
-     *
-     * @return ClassMetadata
-     */
-    public function getClassMetadata(string $documentName): ClassMetadata
-    {
-        return $this->documentManager->getClassMetadata($documentName);
+        $this->metadataFactory = $metadataFactory;
+        $this->doctrineRegistry = $doctrineRegistry;
     }
 
     /**
@@ -52,7 +47,13 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInter
      */
     public function supports($class): bool
     {
-        return false;
+        try {
+            $this->metadataFactory->getMetadataFor(get_class($class));
+        } catch (MappingException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

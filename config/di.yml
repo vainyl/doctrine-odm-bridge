@@ -25,6 +25,9 @@ services:
       - '@time.factory'
   doctrine.document.manager.factory:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentManagerFactory
+  doctrine.document.metadata.factory:
+    class: Doctrine\ODM\MongoDB\Mapping\ClassMetadataFactory
+    factory: ['@doctrine.entity.manager', 'getMetadataFactory']
   collection.factory.sequence.document:
     decorates: collection.factory.sequence
     decoration_priority: 500
@@ -47,11 +50,7 @@ services:
     arguments: ['@connection.storage', '@doctrine.event.manager']
   document.hydrator.doctrine:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentHydrator
-    arguments: ['@doctrine.document.manager']
-    tags:
-      - {name: hydrator, alias: doctrine.document}
+    arguments: ['@doctrine.document.metadata.factory', '@doctrine.registry']
   document.factory.doctrine:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentFactory
-    arguments: ['@hydrator.storage']
-    tags:
-      - {name: array.factory, alias: doctrine.document}
+    arguments: ['@doctrine.document.metadata.factory', '@doctrine.document.metadata.factory']
