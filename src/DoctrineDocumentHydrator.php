@@ -117,8 +117,6 @@ class DoctrineDocumentHydrator extends AbstractHydrator
         $classMetadata = $this->metadataFactory->getMetadataFor($documentName);
         $document = $classMetadata->newInstance();
 
-        $classMetadata = $this->metadataFactory->getMetadataFor(get_class($document));
-
         foreach ($documentData as $field => $value) {
             switch (true) {
                 case array_key_exists($field, $classMetadata->associationMappings):
