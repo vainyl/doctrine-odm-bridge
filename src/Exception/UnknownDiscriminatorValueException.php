@@ -12,15 +12,15 @@ declare(strict_types=1);
 
 namespace Vainyl\Doctrine\ODM\Exception;
 
-use Vainyl\Core\Exception\AbstractArrayFactoryException;
-use Vainyl\Document\Factory\DocumentFactoryInterface;
+use Vainyl\Core\Exception\AbstractHydratorException;
+use Vainyl\Core\Hydrator\HydratorInterface;
 
 /**
  * Class UnknownDiscriminatorValueException
  *
  * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
-class UnknownDiscriminatorValueException extends AbstractArrayFactoryException
+class UnknownDiscriminatorValueException extends AbstractHydratorException
 {
     private $value;
 
@@ -29,16 +29,16 @@ class UnknownDiscriminatorValueException extends AbstractArrayFactoryException
     /**
      * UnknownDiscriminatorValueException constructor.
      *
-     * @param DocumentFactoryInterface $factory
-     * @param string                   $value
-     * @param array                    $discriminatorMap
+     * @param HydratorInterface $hydrator
+     * @param string            $value
+     * @param array             $discriminatorMap
      */
-    public function __construct(DocumentFactoryInterface $factory, $value, array $discriminatorMap)
+    public function __construct(HydratorInterface $hydrator, $value, array $discriminatorMap)
     {
         $this->value = $value;
         $this->discriminatorMap = $discriminatorMap;
         parent::__construct(
-            $factory,
+            $hydrator,
             sprintf(
                 'Value %s is not found in discriminator map %s',
                 $value,

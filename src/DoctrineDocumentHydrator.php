@@ -4,7 +4,7 @@
  *
  * PHP Version 7
  *
- * @package   Doctrine
+ * @package   Doctrine-odm-bridge
  * @license   https://opensource.org/licenses/MIT MIT License
  * @link      https://vainyl.com
  */
@@ -15,50 +15,83 @@ namespace Vainyl\Doctrine\ODM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry as DoctrineRegistryInterface;
 use Doctrine\Common\Persistence\ObjectRepository as DoctrineRepositoryInterface;
+use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataFactory;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo;
-use Doctrine\ODM\MongoDB\Mapping\MappingException;
 use Doctrine\ODM\MongoDB\Types\Type;
 use Vainyl\Core\ArrayInterface;
 use Vainyl\Core\Hydrator\AbstractHydrator;
-use Vainyl\Core\Hydrator\HydratorInterface;
+use Vainyl\Doctrine\ODM\Exception\MissingDiscriminatorColumnException;
+use Vainyl\Doctrine\ODM\Exception\UnknownDiscriminatorValueException;
 use Vainyl\Document\DocumentInterface;
 
 /**
  * Class DoctrineDocumentHydrator
  *
- * @author Nazar Ivanenko <nivanenko@gmail.com>
+ * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
-class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInterface
+class DoctrineDocumentHydrator extends AbstractHydrator
 {
-    private $metadataFactory;
-
     private $doctrineRegistry;
+
+    private $metadataFactory;
 
     /**
      * DoctrineDocumentHydrator constructor.
      *
-     * @param ClassMetadataFactory      $metadataFactory
      * @param DoctrineRegistryInterface $doctrineRegistry
+     * @param ClassMetadataFactory      $metadataFactory
      */
-    public function __construct(ClassMetadataFactory $metadataFactory, DoctrineRegistryInterface $doctrineRegistry)
+    public function __construct(DoctrineRegistryInterface $doctrineRegistry, ClassMetadataFactory $metadataFactory)
     {
-        $this->metadataFactory = $metadataFactory;
         $this->doctrineRegistry = $doctrineRegistry;
+        $this->metadataFactory = $metadataFactory;
     }
 
     /**
      * @inheritDoc
      */
-    public function supports($class): bool
+    public function supports(string $className): bool
     {
         try {
-            $this->metadataFactory->getMetadataFor(get_class($class));
+            $this->metadataFactory->getMetadataFor($className);
         } catch (MappingException $e) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @param array         $documentData
+     * @param ClassMetadata $classMetadata
+     *
+     * @return string
+     */
+    public function getDocumentName(array $documentData, ClassMetadata $classMetadata): string
+    {
+        if (ClassMetadata::INHERITANCE_TYPE_NONE === $classMetadata->inheritanceType) {
+            return $classMetadata->name;
+        }
+
+        if (false === array_key_exists($classMetadata->discriminatorField, $documentData)) {
+            throw new MissingDiscriminatorColumnException(
+                $this,
+                $classMetadata->discriminatorField,
+                $documentData
+            );
+        }
+
+        $discriminatorColumnValue = $documentData[$classMetadata->discriminatorField];
+        if (false === array_key_exists($discriminatorColumnValue, $classMetadata->discriminatorMap)) {
+            throw new UnknownDiscriminatorValueException(
+                $this,
+                $discriminatorColumnValue,
+                $classMetadata->discriminatorMap
+            );
+        }
+
+        return $classMetadata->discriminatorMap[$discriminatorColumnValue];
     }
 
     /**
@@ -74,12 +107,16 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInter
     /**
      * @inheritDoc
      */
-    public function doHydrate($document, array $documentData): ArrayInterface
+    public function doCreate(string $name, array $documentData = []): ArrayInterface
     {
         /**
-         * @var ClassMetadataInfo $classMetadata
+         * @var ClassMetadata     $classMetadata
          * @var DocumentInterface $document
          */
+        $documentName = $this->getDocumentName($documentData, $this->metadataFactory->getMetadataFor($name));
+        $classMetadata = $this->metadataFactory->getMetadataFor($documentName);
+        $document = $classMetadata->newInstance();
+
         $classMetadata = $this->metadataFactory->getMetadataFor(get_class($document));
 
         foreach ($documentData as $field => $value) {
@@ -88,7 +125,7 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInter
                     $associationMapping = $classMetadata->associationMappings[$field];
                     $referenceEntity = $associationMapping['targetDocument'];
                     switch ($associationMapping['association']) {
-                        case ClassMetadataInfo::REFERENCE_ONE:
+                        case ClassMetadata::REFERENCE_ONE:
                             $classMetadata->reflFields[$associationMapping['fieldName']]
                                 ->setValue(
                                     $document,
@@ -96,7 +133,7 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInter
                                 );
 
                             break;
-                        case ClassMetadataInfo::REFERENCE_MANY:
+                        case ClassMetadata::REFERENCE_MANY:
                             $collection = new ArrayCollection();
                             $repository = $this->getRepository($referenceEntity);
                             foreach ($value as $referenceData) {
@@ -109,9 +146,9 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInter
                                 );
 
                             break;
-                        case ClassMetadataInfo::EMBED_ONE:
+                        case ClassMetadata::EMBED_ONE:
                             break;
-                        case ClassMetadataInfo::EMBED_MANY:
+                        case ClassMetadata::EMBED_MANY:
                             break;
                     }
                     break;
@@ -124,5 +161,13 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInter
         }
 
         return $document;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function doUpdate($object, array $data): ArrayInterface
+    {
+        trigger_error('Method doUpdate is not implemented', E_USER_ERROR);
     }
 }

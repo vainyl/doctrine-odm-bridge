@@ -52,7 +52,4 @@ services:
     arguments: ['@connection.storage', '@doctrine.event.manager']
   document.hydrator.doctrine:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentHydrator
-    arguments: ['@doctrine.document.metadata.factory', '@doctrine.registry']
-  document.factory.doctrine:
-    class: Vainyl\Doctrine\ODM\DoctrineDocumentFactory
-    arguments: ['@document.hydrator.doctrine', '@doctrine.document.metadata.factory']
+    arguments: ['@doctrine.registry', '@doctrine.document.metadata.factory']
