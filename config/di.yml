@@ -55,4 +55,4 @@ services:
     arguments: ['@doctrine.document.metadata.factory', '@doctrine.registry']
   document.factory.doctrine:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentFactory
-    arguments: ['@doctrine.document.metadata.factory', '@doctrine.document.metadata.factory']
+    arguments: ['@document.hydrator.doctrine', '@doctrine.document.metadata.factory']
