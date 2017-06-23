@@ -36,6 +36,6 @@ class DoctrineDocumentFactory extends AbstractArrayFactory implements DocumentFa
      */
     public function doCreate(string $name, array $data = []): ArrayInterface
     {
-        trigger_error('Method create is not implemented', E_USER_ERROR);
+        return null;
     }
 }
