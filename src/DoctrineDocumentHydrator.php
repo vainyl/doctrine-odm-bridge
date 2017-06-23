@@ -84,15 +84,10 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInter
 
         foreach ($documentData as $field => $value) {
             switch (true) {
-                case array_key_exists($field, $classMetadata->fieldMappings):
-                    $fieldMapping = $classMetadata->fieldMappings[$field];
-                    $classMetadata->reflFields[$fieldMapping['fieldName']]
-                        ->setValue($document, Type::getType($fieldMapping['type'])->convertToPHPValue($value));
-                    break;
                 case array_key_exists($field, $classMetadata->associationMappings):
                     $associationMapping = $classMetadata->associationMappings[$field];
-                    $referenceEntity = $associationMapping['targetEntity'];
-                    switch ($associationMapping['type']) {
+                    $referenceEntity = $associationMapping['targetDocument'];
+                    switch ($associationMapping['association']) {
                         case ClassMetadataInfo::REFERENCE_ONE:
                             $classMetadata->reflFields[$associationMapping['fieldName']]
                                 ->setValue(
@@ -119,6 +114,12 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInter
                         case ClassMetadataInfo::EMBED_MANY:
                             break;
                     }
+                    break;
+                case array_key_exists($field, $classMetadata->fieldMappings):
+                    $fieldMapping = $classMetadata->fieldMappings[$field];
+                    $classMetadata->reflFields[$fieldMapping['fieldName']]
+                        ->setValue($document, Type::getType($fieldMapping['type'])->convertToPHPValue($value));
+                    break;
             }
         }
 
