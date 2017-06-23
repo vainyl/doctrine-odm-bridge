@@ -152,7 +152,6 @@ class DoctrineDocumentHydrator extends AbstractHydrator
                             if (null === ($processedValue = $this->getRepository($referenceEntity)->find($value))) {
                                 throw new UnknownReferenceEntityException($this, $referenceEntity, $value);
                             }
-
                             $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
                             break;
                         case ClassMetadata::REFERENCE_MANY:
