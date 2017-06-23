@@ -1,0 +1,55 @@
+services:
+  doctrine.configuration.odm:
+    class: Doctrine\ODM\MongoDB\Configuration
+    factory: ['@doctrine.configuration.factory.odm', 'getConfiguration']
+    arguments:
+      - '@doctrine.cache'
+      - '@app.environment'
+      - 'doctrine'
+      - 'yaml'
+      - 'entitymap'
+      - '.odm.yml'
+      - 'doctrine'
+      - 'Proxy'
+      - 'Hydrator'
+  doctrine.configuration.factory.odm:
+    class: Vainyl\Doctrine\ODM\Factory\DoctrineODMConfigurationFactory
+    arguments: ['@extension.storage']
+  doctrine.document.manager:
+    class: Vainyl\Doctrine\ODM\DoctrineDocumentManager
+    factory: ['@doctrine.document.manager.factory', 'create']
+    arguments:
+      - '@database.doctrine.odm'
+      - '@doctrine.configuration.odm'
+      - '@doctrine.event.manager'
+      - '@time.factory'
+    tags:
+      - {name: 'doctrine.manager', alias: 'document'}
+  doctrine.document.manager.factory:
+    class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentManagerFactory
+  doctrine.document.metadata.factory:
+    class: Doctrine\ODM\MongoDB\Mapping\ClassMetadataFactory
+    factory: ['@doctrine.document.manager', 'getMetadataFactory']
+  collection.factory.sequence.document:
+    decorates: collection.factory.sequence
+    decoration_priority: 500
+    class: Vainyl\Doctrine\ODM\Operation\Decorator\DoctrineCollectionFactoryDecorator
+    arguments: ['@collection.factory.sequence.document.inner', '@doctrine.document.manager']
+  document.operation.factory.doctrine:
+    class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
+    arguments: ['@operation.factory', '@doctrine.document.manager']
+  app.bootstrapper.doctrine.odm.annotation:
+    class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineAnnotationBootstrapper
+    tags:
+      - {name: 'bootstrapper'}
+  app.bootstrapper.doctrine.odm.type:
+    class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineTypeBootstrapper
+    arguments: ['@time.factory']
+    tags:
+      - {name: 'bootstrapper'}
+  database.factory.doctrine.odm:
+    class: Vainyl\Doctrine\ODM\Factory\DoctrineODMDatabaseFactory
+    arguments: ['@connection.storage', '@doctrine.event.manager']
+  document.hydrator.doctrine:
+    class: Vainyl\Doctrine\ODM\DoctrineDocumentHydrator
+    arguments: ['@doctrine.registry', '@doctrine.document.metadata.factory']

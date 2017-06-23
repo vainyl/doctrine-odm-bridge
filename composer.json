@@ -9,14 +9,16 @@
     ],
     "autoload": {
         "psr-4": {
-            "Vainyl\\Doctrine\\ODM": "src/"
+            "Vainyl\\Doctrine\\ODM\\": "src/"
         }
     },
     "require": {
-        "php": ">=7.1",
-        "vainyl/core": "dev-master",
-        "vainyl/database": "dev-master",
-        "vainyl/time": "dev-master"
+        "doctrine/mongodb-odm": "^1.1",
+        "vainyl/core": "0.1.x-dev",
+        "vainyl/document": "0.1.x-dev",
+        "vainyl/mongo": "0.1.x-dev",
+        "vainyl/operation": "0.1.x-dev",
+        "vainyl/time": "0.1.x-dev"
     },
     "repositories": [
         {
