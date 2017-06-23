@@ -10,7 +10,6 @@
  */
 declare(strict_types=1);
 
-
 namespace Vainyl\Doctrine\ODM\Type;
 
 use Doctrine\ODM\MongoDB\Types\Type;
@@ -41,6 +40,9 @@ class TimeType extends Type
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function convertToDatabaseValue($value)
     {
         if (null === $value) {
@@ -48,18 +50,27 @@ class TimeType extends Type
         }
 
         if ($value instanceof TimeInterface) {
-            return $value->toDateTime();
+            return new \MongoDate($value->format('U'), $value->format('u'));
         }
 
         throw new \InvalidArgumentException(sprintf('%s is not a properly formatted TIME type.', get_class($value)));
     }
 
+    /**
+     * @inheritDoc
+     */
     public function convertToPHPValue($value)
     {
         if ($value === null || $value instanceof TimeInterface) {
             return $value;
         }
 
-        return $this->timeFactory->createFromString($value);
+        $seconds = $value->sec;
+        $microseconds = str_pad($value->usec, 6, '0', STR_PAD_LEFT); // ensure microseconds
+
+        $datetime = new \DateTime();
+        $datetime->setTimestamp($seconds);
+
+        return $this->timeFactory->createFromString($datetime->format('Y-m-d H:i:s.u'));
     }
 }
