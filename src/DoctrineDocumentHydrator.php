@@ -15,16 +15,17 @@ namespace Vainyl\Doctrine\ODM;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo as ClassMetadata;
-use Vainyl\Core\AbstractIdentifiable;
+use Vainyl\Core\ArrayInterface;
+use Vainyl\Core\Hydrator\AbstractHydrator;
+use Vainyl\Core\Hydrator\HydratorInterface;
 use Vainyl\Document\DocumentInterface;
-use Vainyl\Document\Hydrator\DocumentHydratorInterface;
 
 /**
  * Class DoctrineDocumentHydrator
  *
  * @author Nazar Ivanenko <nivanenko@gmail.com>
  */
-class DoctrineDocumentHydrator extends AbstractIdentifiable implements DocumentHydratorInterface
+class DoctrineDocumentHydrator extends AbstractHydrator implements HydratorInterface
 {
     private $documentManager;
 
@@ -51,7 +52,15 @@ class DoctrineDocumentHydrator extends AbstractIdentifiable implements DocumentH
     /**
      * @inheritDoc
      */
-    public function hydrate(string $name, array $documentData): DocumentInterface
+    public function supports(object $class): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function doHydrate($name, array $documentData): ArrayInterface
     {
         $class = $this->documentManager->getClassMetadata($name);
 
