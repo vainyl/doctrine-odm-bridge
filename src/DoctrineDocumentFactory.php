@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Vainyl\Doctrine\ODM;
 
+use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataFactory;
 use Vainyl\Core\ArrayInterface;
@@ -49,7 +50,13 @@ class DoctrineDocumentFactory extends AbstractArrayFactory implements DocumentFa
      */
     public function supports(string $name): bool
     {
-        return false;
+        try {
+            $this->metadataFactory->getMetadataFor($name);
+        } catch (MappingException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
