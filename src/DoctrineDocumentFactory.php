@@ -65,7 +65,7 @@ class DoctrineDocumentFactory extends AbstractArrayFactory implements DocumentFa
      *
      * @return string
      */
-    public function getEntityName(array $documentData, ClassMetadata $classMetadata): string
+    public function getDocumentName(array $documentData, ClassMetadata $classMetadata): string
     {
         if (ClassMetadata::INHERITANCE_TYPE_NONE === $classMetadata->inheritanceType) {
             return $classMetadata->name;
@@ -96,7 +96,7 @@ class DoctrineDocumentFactory extends AbstractArrayFactory implements DocumentFa
      */
     public function doCreate(string $name, array $documentData = []): ArrayInterface
     {
-        $documentName = $this->getEntityName($documentData, $this->metadataFactory->getMetadataFor($name));
+        $documentName = $this->getDocumentName($documentData, $this->metadataFactory->getMetadataFor($name));
         $document = $this->metadataFactory->getMetadataFor($documentName)->newInstance();
 
         return $this->hydrator->hydrate($document, $documentData);
