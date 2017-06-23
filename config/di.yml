@@ -48,3 +48,10 @@ services:
   document.hydrator.doctrine:
     class: Vainyl\Doctrine\Hydrator\DoctrineDocumentHydrator
     arguments: ['@doctrine.document.manager']
+    tags:
+      - {name: hydrator, alias: doctrine.document}
+  document.factory.doctrine:
+    class: Vainyl\Doctrine\ODM\DoctrineDocumentFactory
+    arguments: ['@hydrator.storage']
+    tags:
+      - {name: array.factory, alias: doctrine.document}
