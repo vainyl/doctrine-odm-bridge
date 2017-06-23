@@ -29,7 +29,7 @@ services:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentManagerFactory
   doctrine.document.metadata.factory:
     class: Doctrine\ODM\MongoDB\Mapping\ClassMetadataFactory
-    factory: ['@doctrine.entity.manager', 'getMetadataFactory']
+    factory: ['@doctrine.document.manager', 'getMetadataFactory']
   collection.factory.sequence.document:
     decorates: collection.factory.sequence
     decoration_priority: 500
