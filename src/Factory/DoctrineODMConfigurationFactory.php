@@ -68,10 +68,10 @@ class DoctrineODMConfigurationFactory extends AbstractIdentifiable
     ): Configuration {
         $paths = [];
         /**
-         * @var AbstractExtension $extension
+         * @var AbstractExtension $bundle
          */
-        foreach ($this->bundleStorage as $extension) {
-            $paths[$extension->getConfigDirectory()] = $extension->getNamespace();
+        foreach ($this->bundleStorage as $bundle) {
+            $paths[$bundle->getConfigDirectory()] = $bundle->getNamespace();
         }
         $paths[$environment->getConfigDirectory()] = '';
 
