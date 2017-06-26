@@ -21,7 +21,6 @@ use Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver;
 use Vainyl\Core\AbstractIdentifiable;
 use Vainyl\Core\Application\EnvironmentInterface;
 use Vainyl\Core\Extension\AbstractExtension;
-use Vainyl\Core\Storage\StorageInterface;
 use Vainyl\Doctrine\ODM\Exception\UnknownDoctrineConfigTypeException;
 
 /**
@@ -31,16 +30,16 @@ use Vainyl\Doctrine\ODM\Exception\UnknownDoctrineConfigTypeException;
  */
 class DoctrineODMConfigurationFactory extends AbstractIdentifiable
 {
-    private $extensionStorage;
+    private $bundleStorage;
 
     /**
      * DoctrineConfigurationFactory constructor.
      *
-     * @param StorageInterface $extensionStorage
+     * @param \Traversable $bundleStorage
      */
-    public function __construct(StorageInterface $extensionStorage)
+    public function __construct(\Traversable $bundleStorage)
     {
-        $this->extensionStorage = $extensionStorage;
+        $this->bundleStorage = $bundleStorage;
     }
 
     /**
@@ -71,7 +70,7 @@ class DoctrineODMConfigurationFactory extends AbstractIdentifiable
         /**
          * @var AbstractExtension $extension
          */
-        foreach ($this->extensionStorage->getIterator() as $extension) {
+        foreach ($this->bundleStorage as $extension) {
             $paths[$extension->getConfigDirectory()] = $extension->getNamespace();
         }
         $paths[$environment->getConfigDirectory()] = '';
