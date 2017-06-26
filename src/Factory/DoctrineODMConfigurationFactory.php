@@ -20,7 +20,6 @@ use Doctrine\ODM\MongoDB\Mapping\Driver\SimplifiedYamlDriver;
 use Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver;
 use Vainyl\Core\AbstractIdentifiable;
 use Vainyl\Core\Application\EnvironmentInterface;
-use Vainyl\Core\Extension\AbstractExtension;
 use Vainyl\Core\Extension\ExtensionInterface;
 use Vainyl\Doctrine\ODM\Exception\UnknownDoctrineConfigTypeException;
 
