@@ -30,16 +30,16 @@ use Vainyl\Doctrine\ODM\Exception\UnknownDoctrineConfigTypeException;
  */
 class DoctrineODMConfigurationFactory extends AbstractIdentifiable
 {
-    private $extensionStorage;
+    private $bundleStorage;
 
     /**
      * DoctrineConfigurationFactory constructor.
      *
-     * @param \Traversable $extensionStorage
+     * @param \Traversable $bundleStorage
      */
-    public function __construct(\Traversable $extensionStorage)
+    public function __construct(\Traversable $bundleStorage)
     {
-        $this->extensionStorage = $extensionStorage;
+        $this->bundleStorage = $bundleStorage;
     }
 
     /**
@@ -68,10 +68,10 @@ class DoctrineODMConfigurationFactory extends AbstractIdentifiable
     ): Configuration {
         $paths = [];
         /**
-         * @var ExtensionInterface $extension
+         * @var ExtensionInterface $bundle
          */
-        foreach ($this->extensionStorage as $extension) {
-            $paths[$extension->getConfigDirectory()] = $extension->getNamespace();
+        foreach ($this->bundleStorage as $bundle) {
+            $paths[$bundle->getConfigDirectory()] = $bundle->getNamespace();
         }
         $paths[$environment->getConfigDirectory()] = '';
 
