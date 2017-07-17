@@ -147,12 +147,12 @@ class DoctrineDocumentHydrator extends AbstractHydrator
                 case array_key_exists($field, $classMetadata->associationMappings):
                     $associationMapping = $classMetadata->associationMappings[$field];
                     $referenceEntity = $associationMapping['targetDocument'];
+                    $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
                     switch ($associationMapping['association']) {
                         case ClassMetadata::REFERENCE_ONE:
                             if (null === ($processedValue = $this->getRepository($referenceEntity)->find($value))) {
                                 throw new UnknownReferenceEntityException($this, $referenceEntity, $value);
                             }
-                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
                             break;
                         case ClassMetadata::REFERENCE_MANY:
                             $processedValue = new ArrayCollection();
@@ -163,15 +163,15 @@ class DoctrineDocumentHydrator extends AbstractHydrator
                                 }
                                 $processedValue->add($reference);
                             }
-                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
                             break;
                         case ClassMetadata::EMBED_ONE:
-                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
-                            $processedValue = 1;
+                            $processedValue = $this->create($referenceEntity, $value);
                             break;
                         case ClassMetadata::EMBED_MANY:
-                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
-                            $processedValue = 2;
+                            $processedValue = [];
+                            foreach ($value as $singleDocument) {
+                                $processedValue[] = $this->create($referenceEntity, $singleDocument);
+                            }
                             break;
                     }
                     break;
@@ -208,31 +208,16 @@ class DoctrineDocumentHydrator extends AbstractHydrator
                 case array_key_exists($field, $classMetadata->associationMappings):
                     $associationMapping = $classMetadata->associationMappings[$field];
                     $referenceEntity = $associationMapping['targetDocument'];
+                    $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
                     switch ($associationMapping['association']) {
-                        case ClassMetadata::REFERENCE_ONE:
-                            if (null === ($processedValue = $this->getRepository($referenceEntity)->find($value))) {
-                                throw new UnknownReferenceEntityException($this, $referenceEntity, $value);
-                            }
-                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
-                            break;
-                        case ClassMetadata::REFERENCE_MANY:
-                            $processedValue = new ArrayCollection();
-                            $repository = $this->getRepository($referenceEntity);
-                            foreach ($value as $referenceData) {
-                                if (null === ($reference = $repository->find($referenceData))) {
-                                    throw new UnknownReferenceEntityException($this, $referenceEntity, $referenceData);
-                                }
-                                $processedValue->add($reference);
-                            }
-                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
-                            break;
                         case ClassMetadata::EMBED_ONE:
-                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
-                            $processedValue = 1;
+                            $processedValue = $this->create($referenceEntity, $value);
                             break;
                         case ClassMetadata::EMBED_MANY:
-                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
-                            $processedValue = 2;
+                            $processedValue = [];
+                            foreach ($value as $singleDocument) {
+                                $processedValue[] = $this->create($referenceEntity, $singleDocument);
+                            }
                             break;
                     }
                     break;
