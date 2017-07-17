@@ -26,18 +26,33 @@ class TimeType extends Type
     /**
      * @var TimeFactoryInterface
      */
-    private $timeFactory;
+    private static $timeFactory;
 
     /**
      * @param TimeFactoryInterface $timeFactory
-     *
-     * @return $this
      */
-    public function setTimeFactory(TimeFactoryInterface $timeFactory)
+    public static function setTimeFactory(TimeFactoryInterface $timeFactory)
     {
-        $this->timeFactory = $timeFactory;
+        self::$timeFactory = $timeFactory;
+    }
 
-        return $this;
+    /**
+     * @param array $value
+     *
+     * @return TimeInterface
+     */
+    public static function getDateTime(array $value): TimeInterface
+    {
+        $seconds = $value['timestamp']->sec;
+        $microseconds = str_pad((string)$value['timestamp']->usec, 6, '0', STR_PAD_LEFT); // ensure microseconds
+
+        $datetime = \DateTime::createFromFormat(
+            'Y-m-d H:i:s.u',
+            (new \DateTime())->setTimestamp($seconds)->format('Y-m-d H:i:s') . '.'
+            . $microseconds
+        );
+
+        return self::$timeFactory->createFromString($datetime->format('Y-m-d H:i:s.u'), $value['time_zone']);
     }
 
     /**
@@ -50,7 +65,10 @@ class TimeType extends Type
         }
 
         if ($value instanceof TimeInterface) {
-            return new \MongoDate($value->format('U'), $value->format('u'));
+            return (object)[
+                'timestamp' => new \MongoDate($value->format('U'), $value->format('u')),
+                'time_zone' => $value->getTimezone()->getAbbreviation(),
+            ];
         }
 
         throw new \InvalidArgumentException(sprintf('%s is not a properly formatted TIME type.', get_class($value)));
@@ -65,12 +83,18 @@ class TimeType extends Type
             return $value;
         }
 
-        $seconds = $value->sec;
-        $microseconds = str_pad($value->usec, 6, '0', STR_PAD_LEFT); // ensure microseconds
+        return self::getDateTime($value);
+    }
 
-        $datetime = new \DateTime();
-        $datetime->setTimestamp($seconds);
-
-        return $this->timeFactory->createFromString($datetime->format('Y-m-d H:i:s.u'));
+    /**
+     * @inheritDoc
+     */
+    public function closureToPHP()
+    {
+        return 'if ($value === null) { 
+                    $return = null; 
+                } else { 
+                    $return = \\' . get_class($this) . '::getDateTime($value);
+                }';
     }
 }

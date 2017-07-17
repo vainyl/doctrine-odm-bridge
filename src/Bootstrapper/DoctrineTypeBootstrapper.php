@@ -52,7 +52,7 @@ class DoctrineTypeBootstrapper extends AbstractIdentifiable implements Bootstrap
     public function process(ApplicationInterface $application): BootstrapperInterface
     {
         Type::addType('v_time', TimeType::class);
-        Type::getType('v_time')->setTimeFactory($this->timeFactory);
+        TimeType::setTimeFactory($this->timeFactory);
 
         return $this;
     }
