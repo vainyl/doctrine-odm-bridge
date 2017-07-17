@@ -193,8 +193,61 @@ class DoctrineDocumentHydrator extends AbstractHydrator
     /**
      * @inheritDoc
      */
-    public function doUpdate($object, array $data): ArrayInterface
+    public function doUpdate($document, array $documentData): ArrayInterface
     {
-        trigger_error('Method doUpdate is not implemented', E_USER_ERROR);
+        /**
+         * @var ClassMetadata     $classMetadata
+         * @var DocumentInterface $document
+         * @var DocumentInterface $newDocument
+         */
+        $classMetadata = $this->metadataFactory->getMetadataFor(get_class($document));
+
+        foreach ($documentData as $field => $value) {
+            $reflectionField = $processedValue = null;
+            switch (true) {
+                case array_key_exists($field, $classMetadata->associationMappings):
+                    $associationMapping = $classMetadata->associationMappings[$field];
+                    $referenceEntity = $associationMapping['targetDocument'];
+                    switch ($associationMapping['association']) {
+                        case ClassMetadata::REFERENCE_ONE:
+                            if (null === ($processedValue = $this->getRepository($referenceEntity)->find($value))) {
+                                throw new UnknownReferenceEntityException($this, $referenceEntity, $value);
+                            }
+                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
+                            break;
+                        case ClassMetadata::REFERENCE_MANY:
+                            $processedValue = new ArrayCollection();
+                            $repository = $this->getRepository($referenceEntity);
+                            foreach ($value as $referenceData) {
+                                if (null === ($reference = $repository->find($referenceData))) {
+                                    throw new UnknownReferenceEntityException($this, $referenceEntity, $referenceData);
+                                }
+                                $processedValue->add($reference);
+                            }
+                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
+                            break;
+                        case ClassMetadata::EMBED_ONE:
+                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
+                            $processedValue = 1;
+                            break;
+                        case ClassMetadata::EMBED_MANY:
+                            $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
+                            $processedValue = 2;
+                            break;
+                    }
+                    break;
+                case array_key_exists($field, $classMetadata->fieldMappings):
+                    $fieldMapping = $classMetadata->fieldMappings[$field];
+                    $processedValue = Type::getType($fieldMapping['type'])->convertToPHPValue($value);
+                    $reflectionField = $classMetadata->reflFields[$fieldMapping['fieldName']];
+
+                    break;
+            }
+            if (null !== $reflectionField) {
+                $reflectionField->setValue($document, $processedValue);
+            }
+        }
+
+        return $document;
     }
 }
