@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Vainyl\Doctrine\ODM\Operation\Factory;
 
 use Doctrine\Common\Persistence\ObjectManager as DocumentManagerInterface;
+use Vainyl\Core\AbstractIdentifiable;
 use Vainyl\Doctrine\ODM\Operation\CreateDoctrineDocumentOperation;
 use Vainyl\Doctrine\ODM\Operation\DeleteDoctrineDocumentOperation;
 use Vainyl\Doctrine\ODM\Operation\UpdateDoctrineDocumentOperation;
@@ -20,8 +21,6 @@ use Vainyl\Doctrine\ODM\Operation\UpsertDoctrineDocumentOperation;
 use Vainyl\Document\DocumentInterface;
 use Vainyl\Document\Operation\Factory\DocumentOperationFactoryInterface;
 use Vainyl\Domain\DomainInterface;
-use Vainyl\Domain\Operation\Decorator\AbstractDomainOperationFactoryDecorator;
-use Vainyl\Domain\Operation\Factory\DomainOperationFactoryInterface;
 use Vainyl\Operation\Collection\Factory\CollectionFactoryInterface;
 use Vainyl\Operation\OperationInterface;
 
@@ -30,7 +29,7 @@ use Vainyl\Operation\OperationInterface;
  *
  * @author Nazar Ivanenko <nivanenko@gmail.com>
  */
-class DoctrineDocumentOperationFactory extends AbstractDomainOperationFactoryDecorator implements
+class DoctrineDocumentOperationFactory extends AbstractIdentifiable implements
     DocumentOperationFactoryInterface
 {
     private $collectionFactory;
@@ -40,18 +39,15 @@ class DoctrineDocumentOperationFactory extends AbstractDomainOperationFactoryDec
     /**
      * DoctrineDocumentOperationFactory constructor.
      *
-     * @param DomainOperationFactoryInterface $operationFactory
-     * @param CollectionFactoryInterface      $collectionFactory
-     * @param DocumentManagerInterface        $documentManager
+     * @param CollectionFactoryInterface $collectionFactory
+     * @param DocumentManagerInterface   $documentManager
      */
     public function __construct(
-        DomainOperationFactoryInterface $operationFactory,
         CollectionFactoryInterface $collectionFactory,
         DocumentManagerInterface $documentManager
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->documentManager = $documentManager;
-        parent::__construct($operationFactory);
     }
 
     /**
@@ -61,10 +57,7 @@ class DoctrineDocumentOperationFactory extends AbstractDomainOperationFactoryDec
      */
     public function create(DomainInterface $domain): OperationInterface
     {
-        return $this->collectionFactory
-            ->create()
-            ->add(parent::create($domain))
-            ->add(new CreateDoctrineDocumentOperation($this->documentManager, $domain));
+        return new CreateDoctrineDocumentOperation($this->documentManager, $domain);
     }
 
     /**
@@ -74,10 +67,7 @@ class DoctrineDocumentOperationFactory extends AbstractDomainOperationFactoryDec
      */
     public function delete(DomainInterface $domain): OperationInterface
     {
-        return $this->collectionFactory
-            ->create()
-            ->add(parent::delete($domain))
-            ->add(new DeleteDoctrineDocumentOperation($this->documentManager, $domain));
+        return new DeleteDoctrineDocumentOperation($this->documentManager, $domain);
     }
 
     /**
@@ -96,10 +86,7 @@ class DoctrineDocumentOperationFactory extends AbstractDomainOperationFactoryDec
      */
     public function update(DomainInterface $newDomain, DomainInterface $oldDomain): OperationInterface
     {
-        return $this->collectionFactory
-            ->create()
-            ->add(parent::update($newDomain, $oldDomain))
-            ->add(new UpdateDoctrineDocumentOperation($this->documentManager, $newDomain, $oldDomain));
+        return new UpdateDoctrineDocumentOperation($this->documentManager, $newDomain, $oldDomain);
     }
 
     /**
@@ -109,9 +96,6 @@ class DoctrineDocumentOperationFactory extends AbstractDomainOperationFactoryDec
      */
     public function upsert(DomainInterface $domain): OperationInterface
     {
-        return $this->collectionFactory
-            ->create()
-            ->add(parent::upsert($domain))
-            ->add(new UpsertDoctrineDocumentOperation($this->documentManager, $domain));
+        return new UpsertDoctrineDocumentOperation($this->documentManager, $domain);
     }
 }
