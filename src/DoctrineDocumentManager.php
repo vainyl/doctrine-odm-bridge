@@ -16,6 +16,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\MongoDB\Connection;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\MappingException;
 use Vainyl\Doctrine\ODM\Exception\LevelIntegrityException;
 use Vainyl\Domain\DomainInterface;
 use Vainyl\Domain\Storage\DomainStorageInterface;
@@ -154,6 +155,12 @@ class DoctrineDocumentManager extends DocumentManager implements DomainStorageIn
      */
     public function supports(string $name): bool
     {
-        return $this->getMetadataFactory()->hasMetadataFor($name);
+        try {
+            $this->getMetadataFactory()->getMetadataFor($name);
+        } catch (MappingException $e) {
+            return false;
+        }
+
+        return true;
     }
 }

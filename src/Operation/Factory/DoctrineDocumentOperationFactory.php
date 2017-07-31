@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Vainyl\Doctrine\ODM\Operation\Factory;
 
 use Doctrine\Common\Persistence\ObjectManager as DocumentManagerInterface;
+use Doctrine\ODM\MongoDB\Mapping\MappingException;
 use Vainyl\Core\AbstractIdentifiable;
 use Vainyl\Doctrine\ODM\Operation\CreateDoctrineDocumentOperation;
 use Vainyl\Doctrine\ODM\Operation\DeleteDoctrineDocumentOperation;
@@ -75,7 +76,13 @@ class DoctrineDocumentOperationFactory extends AbstractIdentifiable implements
      */
     public function supports(DomainInterface $domain): bool
     {
-        return $this->documentManager->getMetadataFactory()->hasMetadataFor(get_class($domain));
+        try {
+            $this->documentManager->getMetadataFactory()->getMetadataFor(get_class($domain));
+        } catch (MappingException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
