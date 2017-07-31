@@ -34,7 +34,7 @@ services:
     arguments: ['@collection.factory.sequence.document.inner', '@doctrine.document.manager']
   document.operation.factory.doctrine:
     class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
-    arguments: ['@operation.factory', '@doctrine.document.manager']
+    arguments: ['@domain.operation.factory', '@collection.factory.sequence', '@doctrine.document.manager']
     tags:
       - {name: 'domain.operation.factory', alias: 'doctrine.odm'}
   app.bootstrapper.doctrine.odm.annotation:
