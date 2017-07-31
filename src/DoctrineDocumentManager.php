@@ -13,10 +13,10 @@ declare(strict_types=1);
 namespace Vainyl\Doctrine\ODM;
 
 use Doctrine\Common\EventManager;
+use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\MongoDB\Connection;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Mapping\MappingException;
 use Vainyl\Doctrine\ODM\Exception\LevelIntegrityException;
 use Vainyl\Domain\DomainInterface;
 use Vainyl\Domain\Storage\DomainStorageInterface;

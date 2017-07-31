@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace Vainyl\Doctrine\ODM\Operation\Factory;
 
+use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager as DocumentManagerInterface;
-use Doctrine\ODM\MongoDB\Mapping\MappingException;
 use Vainyl\Core\AbstractIdentifiable;
 use Vainyl\Doctrine\ODM\Operation\CreateDoctrineDocumentOperation;
 use Vainyl\Doctrine\ODM\Operation\DeleteDoctrineDocumentOperation;
