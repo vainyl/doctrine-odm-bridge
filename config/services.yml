@@ -3,15 +3,8 @@ services:
     class: Doctrine\ODM\MongoDB\Configuration
     factory: ['@doctrine.configuration.factory.odm', 'getConfiguration']
     arguments:
-      - '@doctrine.cache'
       - '@app.environment'
-      - 'doctrine'
-      - 'yaml'
-      - 'entitymap'
-      - '.odm.yml'
-      - 'doctrine'
-      - 'Proxy'
-      - 'Hydrator'
+      - '@doctrine.settings.odm'
   doctrine.configuration.factory.odm:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineODMConfigurationFactory
     arguments: ['@bundle.storage']
