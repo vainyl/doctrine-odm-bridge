@@ -20,6 +20,7 @@ use Vainyl\Doctrine\ODM\Operation\UpdateDoctrineDocumentOperation;
 use Vainyl\Doctrine\ODM\Operation\UpsertDoctrineDocumentOperation;
 use Vainyl\Document\DocumentInterface;
 use Vainyl\Document\Operation\Factory\DocumentOperationFactoryInterface;
+use Vainyl\Domain\DomainInterface;
 use Vainyl\Operation\Factory\OperationFactoryInterface;
 use Vainyl\Operation\OperationInterface;
 
@@ -28,7 +29,8 @@ use Vainyl\Operation\OperationInterface;
  *
  * @author Nazar Ivanenko <nivanenko@gmail.com>
  */
-class DoctrineDocumentOperationFactory extends AbstractIdentifiable implements DocumentOperationFactoryInterface
+class DoctrineDocumentOperationFactory extends AbstractIdentifiable implements
+    DocumentOperationFactoryInterface
 {
     private $operationFactory;
 
@@ -47,36 +49,53 @@ class DoctrineDocumentOperationFactory extends AbstractIdentifiable implements D
     }
 
     /**
-     * @inheritDoc
+     * @param DocumentInterface $domain
+     *
+     * @return OperationInterface
      */
-    public function create(DocumentInterface $document): OperationInterface
+    public function create(DomainInterface $domain): OperationInterface
     {
-        return $this->operationFactory->decorate(new CreateDoctrineDocumentOperation($this->documentManager, $document));
+        return $this->operationFactory->decorate(new CreateDoctrineDocumentOperation($this->documentManager, $domain));
+    }
+
+    /**
+     * @param DocumentInterface $domain
+     *
+     * @return OperationInterface
+     */
+    public function delete(DomainInterface $domain): OperationInterface
+    {
+        return $this->operationFactory->decorate(new DeleteDoctrineDocumentOperation($this->documentManager, $domain));
     }
 
     /**
      * @inheritDoc
      */
-    public function update(DocumentInterface $newDocument, DocumentInterface $oldDocument): OperationInterface
+    public function supports(DomainInterface $domain): bool
+    {
+        return $this->documentManager->getMetadataFactory()->hasMetadataFor(get_class($domain));
+    }
+
+    /**
+     * @param DocumentInterface $newDomain
+     * @param DocumentInterface $oldDomain
+     *
+     * @return OperationInterface
+     */
+    public function update(DomainInterface $newDomain, DomainInterface $oldDomain): OperationInterface
     {
         return $this->operationFactory->decorate(
-            new UpdateDoctrineDocumentOperation($this->documentManager, $newDocument, $oldDocument)
+            new UpdateDoctrineDocumentOperation($this->documentManager, $newDomain, $oldDomain)
         );
     }
 
     /**
-     * @inheritDoc
+     * @param DocumentInterface $domain
+     *
+     * @return OperationInterface
      */
-    public function delete(DocumentInterface $document): OperationInterface
+    public function upsert(DomainInterface $domain): OperationInterface
     {
-        return $this->operationFactory->decorate(new DeleteDoctrineDocumentOperation($this->documentManager, $document));
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function upsert(DocumentInterface $document): OperationInterface
-    {
-        return $this->operationFactory->decorate(new UpsertDoctrineDocumentOperation($this->documentManager, $document));
+        return $this->operationFactory->decorate(new UpsertDoctrineDocumentOperation($this->documentManager, $domain));
     }
 }

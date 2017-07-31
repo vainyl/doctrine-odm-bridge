@@ -17,6 +17,7 @@ services:
       - '@doctrine.event.manager'
       - '@time.factory'
     tags:
+      - {name: 'domain.manager', alias: 'doctrine.odm'}
       - {name: 'doctrine.manager', alias: 'document'}
   doctrine.document.manager.factory:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentManagerFactory
@@ -31,6 +32,8 @@ services:
   document.operation.factory.doctrine:
     class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
     arguments: ['@operation.factory', '@doctrine.document.manager']
+    tags:
+      - {name: 'domain.operation.factory'}
   app.bootstrapper.doctrine.odm.annotation:
     class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineAnnotationBootstrapper
     tags:
