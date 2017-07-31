@@ -1,7 +1,7 @@
 services:
   doctrine.settings.odm:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineODMSettings
-    arguments: ['@doctrine.settings', 'yaml', 'entitymap', 'odm.yml', '/tmp', 'Proxy', 'Hydrator']
+    arguments: ['@doctrine.settings', 'admin', 'yaml', 'entitymap', 'odm.yml', '/tmp', 'Proxy', 'Hydrator']
   doctrine.configuration.odm:
     class: Doctrine\ODM\MongoDB\Configuration
     factory: ['@doctrine.configuration.factory.odm', 'getConfiguration']
