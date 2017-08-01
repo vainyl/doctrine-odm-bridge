@@ -31,21 +31,21 @@ class DoctrineODMExtension extends AbstractFrameworkExtension
     {
         parent::load($configs, $container);
 
-        if (false === $container->hasDefinition('doctrine.configuration.odm')) {
-            throw new MissingRequiredServiceException($container, 'doctrine.configuration.odm');
+        if (false === $container->hasDefinition('doctrine.settings.odm')) {
+            throw new MissingRequiredServiceException($container, 'doctrine.settings.odm');
         }
 
         $configuration = new DoctrineODMConfiguration();
         $odmConfig = $this->processConfiguration($configuration, $configs);
-
-        $definition = $container->getDefinition('doctrine.configuration.odm');
-        $definition->replaceArgument(2, $odmConfig['database']);
-        $definition->replaceArgument(3, $odmConfig['config']);
-        $definition->replaceArgument(4, $odmConfig['file']);
-        $definition->replaceArgument(5, $odmConfig['extension']);
-        $definition->replaceArgument(6, $odmConfig['tmp_dir']);
-        $definition->replaceArgument(7, $odmConfig['proxy']);
-        $definition->replaceArgument(8, $odmConfig['hydrator']);
+        $container
+            ->findDefinition('doctrine.settings.odm')
+            ->replaceArgument(1, $odmConfig['database'])
+            ->replaceArgument(2, $odmConfig['config'])
+            ->replaceArgument(3, $odmConfig['file'])
+            ->replaceArgument(4, $odmConfig['extension'])
+            ->replaceArgument(5, $odmConfig['tmp_dir'])
+            ->replaceArgument(6, $odmConfig['proxy'])
+            ->replaceArgument(7, $odmConfig['hydrator']);
 
         return $this;
     }

@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Vainyl\Doctrine\ODM\Operation\Factory;
 
+use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager as DocumentManagerInterface;
 use Vainyl\Core\AbstractIdentifiable;
 use Vainyl\Doctrine\ODM\Operation\CreateDoctrineDocumentOperation;
@@ -20,7 +21,8 @@ use Vainyl\Doctrine\ODM\Operation\UpdateDoctrineDocumentOperation;
 use Vainyl\Doctrine\ODM\Operation\UpsertDoctrineDocumentOperation;
 use Vainyl\Document\DocumentInterface;
 use Vainyl\Document\Operation\Factory\DocumentOperationFactoryInterface;
-use Vainyl\Operation\Factory\OperationFactoryInterface;
+use Vainyl\Domain\DomainInterface;
+use Vainyl\Operation\Collection\Factory\CollectionFactoryInterface;
 use Vainyl\Operation\OperationInterface;
 
 /**
@@ -28,55 +30,79 @@ use Vainyl\Operation\OperationInterface;
  *
  * @author Nazar Ivanenko <nivanenko@gmail.com>
  */
-class DoctrineDocumentOperationFactory extends AbstractIdentifiable implements DocumentOperationFactoryInterface
+class DoctrineDocumentOperationFactory extends AbstractIdentifiable implements
+    DocumentOperationFactoryInterface
 {
-    private $operationFactory;
+    private $collectionFactory;
 
     private $documentManager;
 
     /**
-     * DoctrineEntityOperationFactory constructor.
+     * DoctrineDocumentOperationFactory constructor.
      *
-     * @param OperationFactoryInterface $operationFactory
-     * @param DocumentManagerInterface  $documentManager
+     * @param CollectionFactoryInterface $collectionFactory
+     * @param DocumentManagerInterface   $documentManager
      */
-    public function __construct(OperationFactoryInterface $operationFactory, DocumentManagerInterface $documentManager)
-    {
-        $this->operationFactory = $operationFactory;
+    public function __construct(
+        CollectionFactoryInterface $collectionFactory,
+        DocumentManagerInterface $documentManager
+    ) {
+        $this->collectionFactory = $collectionFactory;
         $this->documentManager = $documentManager;
     }
 
     /**
-     * @inheritDoc
+     * @param DocumentInterface $domain
+     *
+     * @return OperationInterface
      */
-    public function create(DocumentInterface $document): OperationInterface
+    public function create(DomainInterface $domain): OperationInterface
     {
-        return $this->operationFactory->decorate(new CreateDoctrineDocumentOperation($this->documentManager, $document));
+        return new CreateDoctrineDocumentOperation($this->documentManager, $domain);
+    }
+
+    /**
+     * @param DocumentInterface $domain
+     *
+     * @return OperationInterface
+     */
+    public function delete(DomainInterface $domain): OperationInterface
+    {
+        return new DeleteDoctrineDocumentOperation($this->documentManager, $domain);
     }
 
     /**
      * @inheritDoc
      */
-    public function update(DocumentInterface $newDocument, DocumentInterface $oldDocument): OperationInterface
+    public function supports(DomainInterface $domain): bool
     {
-        return $this->operationFactory->decorate(
-            new UpdateDoctrineDocumentOperation($this->documentManager, $newDocument, $oldDocument)
-        );
+        try {
+            $this->documentManager->getMetadataFactory()->getMetadataFor(get_class($domain));
+        } catch (MappingException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
-     * @inheritDoc
+     * @param DocumentInterface $newDomain
+     * @param DocumentInterface $oldDomain
+     *
+     * @return OperationInterface
      */
-    public function delete(DocumentInterface $document): OperationInterface
+    public function update(DomainInterface $newDomain, DomainInterface $oldDomain): OperationInterface
     {
-        return $this->operationFactory->decorate(new DeleteDoctrineDocumentOperation($this->documentManager, $document));
+        return new UpdateDoctrineDocumentOperation($this->documentManager, $newDomain, $oldDomain);
     }
 
     /**
-     * @inheritDoc
+     * @param DocumentInterface $domain
+     *
+     * @return OperationInterface
      */
-    public function upsert(DocumentInterface $document): OperationInterface
+    public function upsert(DomainInterface $domain): OperationInterface
     {
-        return $this->operationFactory->decorate(new UpsertDoctrineDocumentOperation($this->documentManager, $document));
+        return new UpsertDoctrineDocumentOperation($this->documentManager, $domain);
     }
 }

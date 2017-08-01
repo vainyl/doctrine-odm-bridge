@@ -1,17 +1,13 @@
 services:
+  doctrine.settings.odm:
+    class: Vainyl\Doctrine\ODM\Factory\DoctrineODMSettings
+    arguments: ['@doctrine.settings', 'admin', 'yaml', 'entitymap', 'odm.yml', '/tmp', 'Proxy', 'Hydrator']
   doctrine.configuration.odm:
     class: Doctrine\ODM\MongoDB\Configuration
     factory: ['@doctrine.configuration.factory.odm', 'getConfiguration']
     arguments:
-      - '@doctrine.cache'
       - '@app.environment'
-      - 'doctrine'
-      - 'yaml'
-      - 'entitymap'
-      - '.odm.yml'
-      - 'doctrine'
-      - 'Proxy'
-      - 'Hydrator'
+      - '@doctrine.settings.odm'
   doctrine.configuration.factory.odm:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineODMConfigurationFactory
     arguments: ['@bundle.storage']
@@ -24,6 +20,7 @@ services:
       - '@doctrine.event.manager'
       - '@time.factory'
     tags:
+      - {name: 'domain.storage', alias: 'doctrine.odm'}
       - {name: 'doctrine.manager', alias: 'document'}
   doctrine.document.manager.factory:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentManagerFactory
@@ -37,7 +34,9 @@ services:
     arguments: ['@collection.factory.sequence.document.inner', '@doctrine.document.manager']
   document.operation.factory.doctrine:
     class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
-    arguments: ['@operation.factory', '@doctrine.document.manager']
+    arguments: ['@collection.factory.sequence', '@doctrine.document.manager']
+    tags:
+      - {name: 'domain.operation.factory', alias: 'doctrine.odm'}
   app.bootstrapper.doctrine.odm.annotation:
     class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineAnnotationBootstrapper
     tags:
@@ -52,4 +51,10 @@ services:
     arguments: ['@connection.storage', '@doctrine.event.manager']
   document.hydrator.doctrine:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentHydrator
-    arguments: ['@doctrine.registry', '@doctrine.document.metadata.factory']
+    arguments:
+      - '@hydrator.registry'
+      - '@domain.storage'
+      - '@doctrine.document.metadata.factory'
+    tags:
+      - {name: hydrator, alias: doctrine.orm}
+      - {name: domain.hydrator, alias: doctrine.orm}

@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Vainyl\Doctrine\ODM\Factory;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Cache\Cache as DoctrineCacheInterface;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 use Doctrine\ODM\MongoDB\Mapping\Driver\SimplifiedYamlDriver;
@@ -43,30 +42,19 @@ class DoctrineODMConfigurationFactory extends AbstractIdentifiable
     }
 
     /**
-     * @param DoctrineCacheInterface $doctrineCache
-     * @param EnvironmentInterface   $environment
-     * @param string                 $databaseName
-     * @param string                 $driverName
-     * @param string                 $globalFileName
-     * @param string                 $fileExtension
-     * @param string                 $tmpDir
-     * @param string                 $proxyNamespace
-     * @param string                 $hydratorNamespace
+     * @param EnvironmentInterface $environment
+     * @param DoctrineODMSettings  $settings
      *
      * @return Configuration
+     *
+     * @throws UnknownDoctrineConfigTypeException
      */
-    public function getConfiguration(
-        DoctrineCacheInterface $doctrineCache,
-        EnvironmentInterface $environment,
-        string $databaseName,
-        string $driverName,
-        string $globalFileName,
-        string $fileExtension,
-        string $tmpDir,
-        string $proxyNamespace,
-        string $hydratorNamespace
-    ): Configuration {
+    public function getConfiguration(EnvironmentInterface $environment, DoctrineODMSettings $settings): Configuration
+    {
         $paths = [];
+        foreach ($settings->getExtraPaths() as $extraPath) {
+            $paths[$extraPath['dir']] = $extraPath['prefix'];
+        }
         /**
          * @var ExtensionInterface $bundle
          */
@@ -75,29 +63,29 @@ class DoctrineODMConfigurationFactory extends AbstractIdentifiable
         }
         $paths[$environment->getConfigDirectory()] = '';
 
-        switch ($driverName) {
+        switch ($settings->getDriverName()) {
             case 'yaml':
-                $driver = new SimplifiedYamlDriver($paths, $fileExtension);
+                $driver = new SimplifiedYamlDriver($paths, $settings->getFileExtension());
                 break;
             case 'xml':
-                $driver = new XmlDriver($paths, $fileExtension);
+                $driver = new XmlDriver($paths, $settings->getFileExtension());
                 break;
             case 'annotation':
                 $driver = new AnnotationDriver(new AnnotationReader(), $paths);
                 break;
             default:
-                throw new UnknownDoctrineConfigTypeException($this, $driverName);
+                throw new UnknownDoctrineConfigTypeException($this, $settings->getDriverName());
         }
 
-        $driver->setGlobalBasename($globalFileName);
+        $driver->setGlobalBasename($settings->getGlobalFileName());
         $config = new Configuration();
-        $config->setDefaultDB($databaseName);
-        $config->setProxyDir($environment->getCacheDirectory() . DIRECTORY_SEPARATOR . $tmpDir);
-        $config->setProxyNamespace($proxyNamespace);
-        $config->setHydratorDir($environment->getCacheDirectory() . DIRECTORY_SEPARATOR . $tmpDir);
-        $config->setHydratorNamespace($hydratorNamespace);
+        $config->setDefaultDB($settings->getDatabaseName());
+        $config->setProxyDir($environment->getCacheDirectory() . DIRECTORY_SEPARATOR . $settings->getTmpDir());
+        $config->setProxyNamespace($settings->getProxyNamespace());
+        $config->setHydratorDir($environment->getCacheDirectory() . DIRECTORY_SEPARATOR . $settings->getTmpDir());
+        $config->setHydratorNamespace($settings->getHydratorNamespace());
         $config->setMetadataDriverImpl($driver);
-        $config->setMetadataCacheImpl($doctrineCache);
+        $config->setMetadataCacheImpl($settings->getCache());
         $config->setAutoGenerateProxyClasses($environment->isDebugEnabled());
 
         return $config;
