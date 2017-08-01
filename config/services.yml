@@ -56,5 +56,5 @@ services:
       - '@domain.storage'
       - '@doctrine.document.metadata.factory'
     tags:
-      - {name: hydrator, alias: doctrine.orm}
-      - {name: domain.hydrator, alias: doctrine.orm}
+      - {name: hydrator, alias: doctrine.odm}
+      - {name: domain.hydrator, alias: doctrine.odm}
