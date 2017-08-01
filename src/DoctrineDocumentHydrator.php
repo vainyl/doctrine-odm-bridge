@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Vainyl\Doctrine\ODM;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry as DoctrineRegistryInterface;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\Common\Persistence\ObjectManager as DoctrineManagerInterface;
 use Doctrine\Common\Persistence\ObjectRepository as DoctrineRepositoryInterface;
@@ -23,109 +22,42 @@ use Doctrine\ODM\MongoDB\PersistentCollection;
 use Doctrine\ODM\MongoDB\Types\Type;
 use Vainyl\Core\ArrayInterface;
 use Vainyl\Core\Hydrator\AbstractHydrator;
+use Vainyl\Core\Hydrator\HydratorInterface;
+use Vainyl\Core\Hydrator\Registry\HydratorRegistryInterface;
 use Vainyl\Doctrine\ODM\Exception\MissingDiscriminatorColumnException;
 use Vainyl\Doctrine\ODM\Exception\UnknownDiscriminatorValueException;
 use Vainyl\Doctrine\ODM\Exception\UnknownReferenceEntityException;
 use Vainyl\Document\DocumentInterface;
+use Vainyl\Domain\Hydrator\DomainHydratorInterface;
 
 /**
  * Class DoctrineDocumentHydrator
  *
  * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
-class DoctrineDocumentHydrator extends AbstractHydrator
+class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydratorInterface
 {
-    private $doctrineRegistry;
+    private $hydratorRegistry;
+
+    private $manager;
 
     private $metadataFactory;
 
     /**
      * DoctrineDocumentHydrator constructor.
      *
-     * @param DoctrineRegistryInterface $doctrineRegistry
+     * @param HydratorRegistryInterface $registry
+     * @param DoctrineManagerInterface  $manager
      * @param ClassMetadataFactory      $metadataFactory
      */
-    public function __construct(DoctrineRegistryInterface $doctrineRegistry, ClassMetadataFactory $metadataFactory)
-    {
-        $this->doctrineRegistry = $doctrineRegistry;
+    public function __construct(
+        HydratorRegistryInterface $registry,
+        DoctrineManagerInterface $manager,
+        ClassMetadataFactory $metadataFactory
+    ) {
+        $this->hydratorRegistry = $registry;
+        $this->manager = $manager;
         $this->metadataFactory = $metadataFactory;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function supports(string $className): bool
-    {
-        try {
-            $this->metadataFactory->getMetadataFor($className);
-        } catch (MappingException $e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param array         $documentData
-     * @param ClassMetadata $classMetadata
-     *
-     * @return string
-     */
-    public function getDocumentName(array $documentData, ClassMetadata $classMetadata): string
-    {
-        if (ClassMetadata::INHERITANCE_TYPE_NONE === $classMetadata->inheritanceType) {
-            return $classMetadata->name;
-        }
-
-        if (false === array_key_exists($classMetadata->discriminatorField, $documentData)) {
-            throw new MissingDiscriminatorColumnException(
-                $this,
-                $classMetadata->discriminatorField,
-                $documentData
-            );
-        }
-
-        $discriminatorColumnValue = $documentData[$classMetadata->discriminatorField];
-        if (false === array_key_exists($discriminatorColumnValue, $classMetadata->discriminatorMap)) {
-            throw new UnknownDiscriminatorValueException(
-                $this,
-                $discriminatorColumnValue,
-                $classMetadata->discriminatorMap
-            );
-        }
-
-        return $classMetadata->discriminatorMap[$discriminatorColumnValue];
-    }
-
-    /**
-     * @return DoctrineManagerInterface
-     */
-    public function getDocumentManager(): DoctrineManagerInterface
-    {
-        return $this->doctrineRegistry->getManager('document');
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return DoctrineRepositoryInterface
-     */
-    public function getRepository(string $className): DoctrineRepositoryInterface
-    {
-        return $this->getDocumentManager()->getRepository($className);
-    }
-
-    /**
-     * @param array $mapping
-     *
-     * @return PersistentCollection
-     */
-    public function getPersistentCollection(array $mapping): PersistentCollection
-    {
-        return $this->getDocumentManager()
-                    ->getConfiguration()
-                    ->getPersistentCollectionFactory()
-                    ->create($this->getDocumentManager(), $mapping);
     }
 
     /**
@@ -234,5 +166,92 @@ class DoctrineDocumentHydrator extends AbstractHydrator
         }
 
         return $document;
+    }
+
+    /**
+     * @return DoctrineManagerInterface
+     */
+    public function getDocumentManager(): DoctrineManagerInterface
+    {
+        return $this->manager->getManager('document');
+    }
+
+    /**
+     * @param array         $documentData
+     * @param ClassMetadata $classMetadata
+     *
+     * @return string
+     */
+    public function getDocumentName(array $documentData, ClassMetadata $classMetadata): string
+    {
+        if (ClassMetadata::INHERITANCE_TYPE_NONE === $classMetadata->inheritanceType) {
+            return $classMetadata->name;
+        }
+
+        if (false === array_key_exists($classMetadata->discriminatorField, $documentData)) {
+            throw new MissingDiscriminatorColumnException(
+                $this,
+                $classMetadata->discriminatorField,
+                $documentData
+            );
+        }
+
+        $discriminatorColumnValue = $documentData[$classMetadata->discriminatorField];
+        if (false === array_key_exists($discriminatorColumnValue, $classMetadata->discriminatorMap)) {
+            throw new UnknownDiscriminatorValueException(
+                $this,
+                $discriminatorColumnValue,
+                $classMetadata->discriminatorMap
+            );
+        }
+
+        return $classMetadata->discriminatorMap[$discriminatorColumnValue];
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return HydratorInterface
+     */
+    public function getHydrator(string $className): HydratorInterface
+    {
+        return $this->hydratorRegistry->getHydrator($className);
+    }
+
+    /**
+     * @param array $mapping
+     *
+     * @return PersistentCollection
+     */
+    public function getPersistentCollection(array $mapping): PersistentCollection
+    {
+        return $this->manager
+            ->getConfiguration()
+            ->getPersistentCollectionFactory()
+            ->create($this->manager, $mapping);
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return DoctrineRepositoryInterface
+     */
+    public function getRepository(string $className): DoctrineRepositoryInterface
+    {
+        return $this->manager->getRepository($className);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function supports(string $className): bool
+    {
+        try {
+            $this->metadataFactory->getMetadataFor($className);
+        } catch (MappingException $e) {
+            return false;
+        }
+
+        return true;
     }
 }
