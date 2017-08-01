@@ -4,7 +4,7 @@
  *
  * PHP Version 7
  *
- * @package   Doctrine-odm-bridge
+ * @package   Doctrine-ODM-Bridge
  * @license   https://opensource.org/licenses/MIT MIT License
  * @link      https://vainyl.com
  */
@@ -110,6 +110,8 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                                 );
                             }
                             break;
+                        default:
+                            break;
                     }
                     break;
                 case array_key_exists($field, $classMetadata->fieldMappings):
@@ -150,13 +152,21 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                     $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
                     switch ($associationMapping['association']) {
                         case ClassMetadata::EMBED_ONE:
-                            $processedValue = $this->hydratorRegistry->getHydrator($referenceEntity)->create($referenceEntity, $value);
+                            $processedValue = $this->hydratorRegistry->getHydrator($referenceEntity)->create(
+                                $referenceEntity,
+                                $value
+                            );
                             break;
                         case ClassMetadata::EMBED_MANY:
                             $processedValue = [];
                             foreach ($value as $singleDocument) {
-                                $processedValue[] = $this->hydratorRegistry->getHydrator($referenceEntity)->create($referenceEntity, $singleDocument);
+                                $processedValue[] = $this->hydratorRegistry->getHydrator($referenceEntity)->create(
+                                    $referenceEntity,
+                                    $singleDocument
+                                );
                             }
+                            break;
+                        default:
                             break;
                     }
                     break;
@@ -164,7 +174,8 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                     $fieldMapping = $classMetadata->fieldMappings[$field];
                     $processedValue = Type::getType($fieldMapping['type'])->convertToPHPValue($value);
                     $reflectionField = $classMetadata->reflFields[$fieldMapping['fieldName']];
-
+                    break;
+                default:
                     break;
             }
             if (null !== $reflectionField) {
