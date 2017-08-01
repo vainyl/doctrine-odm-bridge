@@ -14,21 +14,18 @@ namespace Vainyl\Doctrine\ODM;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\Mapping\MappingException;
-use Doctrine\Common\Persistence\ObjectManager as DoctrineManagerInterface;
-use Doctrine\Common\Persistence\ObjectRepository as DoctrineRepositoryInterface;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataFactory;
-use Doctrine\ODM\MongoDB\PersistentCollection;
 use Doctrine\ODM\MongoDB\Types\Type;
 use Vainyl\Core\ArrayInterface;
 use Vainyl\Core\Hydrator\AbstractHydrator;
-use Vainyl\Core\Hydrator\HydratorInterface;
 use Vainyl\Core\Hydrator\Registry\HydratorRegistryInterface;
 use Vainyl\Doctrine\ODM\Exception\MissingDiscriminatorColumnException;
 use Vainyl\Doctrine\ODM\Exception\UnknownDiscriminatorValueException;
 use Vainyl\Doctrine\ODM\Exception\UnknownReferenceEntityException;
 use Vainyl\Document\DocumentInterface;
 use Vainyl\Domain\Hydrator\DomainHydratorInterface;
+use Vainyl\Domain\Storage\DomainStorageInterface;
 
 /**
  * Class DoctrineDocumentHydrator
@@ -39,7 +36,7 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
 {
     private $hydratorRegistry;
 
-    private $manager;
+    private $domainStorage;
 
     private $metadataFactory;
 
@@ -47,16 +44,16 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
      * DoctrineDocumentHydrator constructor.
      *
      * @param HydratorRegistryInterface $registry
-     * @param DoctrineManagerInterface  $manager
+     * @param DomainStorageInterface    $domainStorage
      * @param ClassMetadataFactory      $metadataFactory
      */
     public function __construct(
         HydratorRegistryInterface $registry,
-        DoctrineManagerInterface $manager,
+        DomainStorageInterface $domainStorage,
         ClassMetadataFactory $metadataFactory
     ) {
         $this->hydratorRegistry = $registry;
-        $this->manager = $manager;
+        $this->domainStorage = $domainStorage;
         $this->metadataFactory = $metadataFactory;
     }
 
@@ -82,27 +79,35 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                     $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
                     switch ($associationMapping['association']) {
                         case ClassMetadata::REFERENCE_ONE:
-                            if (null === ($processedValue = $this->getRepository($referenceEntity)->find($value))) {
+                            if (null === ($processedValue = $this->domainStorage->findOne($referenceEntity, $value))) {
                                 throw new UnknownReferenceEntityException($this, $referenceEntity, $value);
                             }
                             break;
                         case ClassMetadata::REFERENCE_MANY:
                             $processedValue = new ArrayCollection();
-                            $repository = $this->getRepository($referenceEntity);
                             foreach ($value as $referenceData) {
-                                if (null === ($reference = $repository->find($referenceData))) {
+                                if (null === ($reference = $this->domainStorage->findOne(
+                                        $referenceEntity,
+                                        $referenceData
+                                    ))) {
                                     throw new UnknownReferenceEntityException($this, $referenceEntity, $referenceData);
                                 }
                                 $processedValue->add($reference);
                             }
                             break;
                         case ClassMetadata::EMBED_ONE:
-                            $processedValue = $this->create($referenceEntity, $value);
+                            $processedValue = $this->hydratorRegistry->getHydrator($referenceEntity)->create(
+                                $referenceEntity,
+                                $value
+                            );
                             break;
                         case ClassMetadata::EMBED_MANY:
                             $processedValue = [];
                             foreach ($value as $singleDocument) {
-                                $processedValue[] = $this->create($referenceEntity, $singleDocument);
+                                $processedValue[] = $this->hydratorRegistry->getHydrator($referenceEntity)->create(
+                                    $referenceEntity,
+                                    $singleDocument
+                                );
                             }
                             break;
                     }
@@ -112,6 +117,8 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                     $processedValue = Type::getType($fieldMapping['type'])->convertToPHPValue($value);
                     $reflectionField = $classMetadata->reflFields[$fieldMapping['fieldName']];
 
+                    break;
+                default:
                     break;
             }
             if (null !== $reflectionField) {
@@ -143,12 +150,12 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                     $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
                     switch ($associationMapping['association']) {
                         case ClassMetadata::EMBED_ONE:
-                            $processedValue = $this->create($referenceEntity, $value);
+                            $processedValue = $this->hydratorRegistry->getHydrator($referenceEntity)->create($referenceEntity, $value);
                             break;
                         case ClassMetadata::EMBED_MANY:
                             $processedValue = [];
                             foreach ($value as $singleDocument) {
-                                $processedValue[] = $this->create($referenceEntity, $singleDocument);
+                                $processedValue[] = $this->hydratorRegistry->getHydrator($referenceEntity)->create($referenceEntity, $singleDocument);
                             }
                             break;
                     }
@@ -198,39 +205,6 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
         }
 
         return $classMetadata->discriminatorMap[$discriminatorColumnValue];
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return HydratorInterface
-     */
-    public function getHydrator(string $className): HydratorInterface
-    {
-        return $this->hydratorRegistry->getHydrator($className);
-    }
-
-    /**
-     * @param array $mapping
-     *
-     * @return PersistentCollection
-     */
-    public function getPersistentCollection(array $mapping): PersistentCollection
-    {
-        return $this->manager
-            ->getConfiguration()
-            ->getPersistentCollectionFactory()
-            ->create($this->manager, $mapping);
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return DoctrineRepositoryInterface
-     */
-    public function getRepository(string $className): DoctrineRepositoryInterface
-    {
-        return $this->manager->getRepository($className);
     }
 
     /**

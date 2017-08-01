@@ -51,7 +51,10 @@ services:
     arguments: ['@connection.storage', '@doctrine.event.manager']
   document.hydrator.doctrine:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentHydrator
-    arguments: ['@hydrator.registry', '@doctrine.document.manager', '@doctrine.document.metadata.factory']
+    arguments:
+      - '@hydrator.registry'
+      - '@domain.storage'
+      - '@doctrine.document.metadata.factory'
     tags:
       - {name: hydrator, alias: doctrine.orm}
       - {name: domain.hydrator, alias: doctrine.orm}
