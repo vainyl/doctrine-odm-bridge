@@ -169,14 +169,6 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
     }
 
     /**
-     * @return DoctrineManagerInterface
-     */
-    public function getDocumentManager(): DoctrineManagerInterface
-    {
-        return $this->manager->getManager('document');
-    }
-
-    /**
      * @param array         $documentData
      * @param ClassMetadata $classMetadata
      *
