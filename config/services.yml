@@ -32,6 +32,11 @@ services:
     decoration_priority: 500
     class: Vainyl\Doctrine\ODM\Operation\Decorator\DoctrineCollectionFactoryDecorator
     arguments: ['@collection.factory.sequence.document.inner', '@doctrine.document.manager']
+  collection.factory.set.document:
+    decorates: collection.factory.set
+    decoration_priority: 500
+    class: Vainyl\Doctrine\ODM\Operation\Decorator\DoctrineCollectionFactoryDecorator
+    arguments: ['@collection.factory.set.document.inner', '@doctrine.document.manager']
   document.operation.factory.doctrine:
     class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
     arguments: ['@collection.factory.sequence', '@doctrine.document.manager']
