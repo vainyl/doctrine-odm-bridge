@@ -14,14 +14,20 @@ namespace Vainyl\Doctrine\ODM\Exception;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 
+/**
+ * Class LevelIntegrityException
+ *
+ * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
+ */
 class LevelIntegrityException extends AbstractDocumentManagerException
 {
     private $level;
 
     /**
      * LevelIntegrityException constructor.
+     *
      * @param DocumentManager $documentManager
-     * @param int $level
+     * @param int             $level
      */
     public function __construct(DocumentManager $documentManager, int $level)
     {

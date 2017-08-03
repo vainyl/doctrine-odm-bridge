@@ -30,7 +30,7 @@ class DoctrineCollectionDecorator extends AbstractCollectionDecorator
     /**
      * DoctrineCollectionDecorator constructor.
      *
-     * @param CollectionInterface $collection
+     * @param CollectionInterface     $collection
      * @param DoctrineDocumentManager $documentManager
      */
     public function __construct(CollectionInterface $collection, DoctrineDocumentManager $documentManager)

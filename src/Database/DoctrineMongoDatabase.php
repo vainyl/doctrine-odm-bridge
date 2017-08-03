@@ -49,13 +49,13 @@ class DoctrineMongoDatabase extends Connection implements DatabaseInterface
     }
 
     /**
-     * @inheritDoc
+     * @param DoctrineMongoDatabase $obj
+     *
+     * @return bool
      */
-    public function runQuery($query, array $bindParams = [], array $bindTypes = []): CursorInterface
+    public function equals($obj): bool
     {
-        trigger_error('Method runQuery is not implemented', E_USER_ERROR);
-
-        return null;
+        return $this->getId() === $obj->getId();
     }
 
     /**
@@ -72,5 +72,23 @@ class DoctrineMongoDatabase extends Connection implements DatabaseInterface
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hash()
+    {
+        return $this->getId();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function runQuery($query, array $bindParams = [], array $bindTypes = []): CursorInterface
+    {
+        trigger_error('Method runQuery is not implemented', E_USER_ERROR);
+
+        return null;
     }
 }

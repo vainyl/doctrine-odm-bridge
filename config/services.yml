@@ -20,8 +20,8 @@ services:
       - '@doctrine.event.manager'
       - '@time.factory'
     tags:
-      - {name: 'domain.storage', alias: 'doctrine.odm'}
-      - {name: 'doctrine.manager', alias: 'document'}
+      - {name: doctrine.manager, alias: odm}
+      - {name: domain.storage, alias: doctrine.odm}
   doctrine.document.manager.factory:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentManagerFactory
   doctrine.document.metadata.factory:
@@ -32,20 +32,25 @@ services:
     decoration_priority: 500
     class: Vainyl\Doctrine\ODM\Operation\Decorator\DoctrineCollectionFactoryDecorator
     arguments: ['@collection.factory.sequence.document.inner', '@doctrine.document.manager']
+  collection.factory.set.document:
+    decorates: collection.factory.set
+    decoration_priority: 500
+    class: Vainyl\Doctrine\ODM\Operation\Decorator\DoctrineCollectionFactoryDecorator
+    arguments: ['@collection.factory.set.document.inner', '@doctrine.document.manager']
   document.operation.factory.doctrine:
     class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
     arguments: ['@collection.factory.sequence', '@doctrine.document.manager']
     tags:
-      - {name: 'domain.operation.factory', alias: 'doctrine.odm'}
+      - {name: document.operation.factory, alias: doctrine}
   app.bootstrapper.doctrine.odm.annotation:
     class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineAnnotationBootstrapper
     tags:
-      - {name: 'bootstrapper'}
+      - {name: bootstrapper}
   app.bootstrapper.doctrine.odm.type:
     class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineTypeBootstrapper
     arguments: ['@time.factory']
     tags:
-      - {name: 'bootstrapper'}
+      - {name: bootstrapper}
   database.factory.doctrine.odm:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineODMDatabaseFactory
     arguments: ['@connection.storage', '@doctrine.event.manager']
@@ -56,5 +61,4 @@ services:
       - '@domain.storage'
       - '@doctrine.document.metadata.factory'
     tags:
-      - {name: hydrator, alias: doctrine.odm}
-      - {name: domain.hydrator, alias: doctrine.odm}
+      - {name: document.hydrator, alias: doctrine}
