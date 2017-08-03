@@ -15,19 +15,29 @@ namespace Vainyl\Doctrine\ODM\Exception;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Vainyl\Core\Exception\AbstractCoreException;
 
-class AbstractDocumentManagerException extends AbstractCoreException implements DocumentManagerExceptionInterface
+/**
+ * Class AbstractDocumentManagerException
+ *
+ * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
+ */
+abstract class AbstractDocumentManagerException extends AbstractCoreException implements DocumentManagerExceptionInterface
 {
     private $documentManager;
 
     /**
      * AbstractDocumentManagerException constructor.
+     *
      * @param DocumentManager $documentManager
-     * @param string $message
-     * @param int $code
+     * @param string          $message
+     * @param int             $code
      * @param \Exception|null $previous
      */
-    public function __construct(DocumentManager $documentManager, string $message, int $code = 500, \Exception $previous = null)
-    {
+    public function __construct(
+        DocumentManager $documentManager,
+        string $message,
+        int $code = 500,
+        \Exception $previous = null
+    ) {
         $this->documentManager = $documentManager;
         parent::__construct($message, $code, $previous);
     }

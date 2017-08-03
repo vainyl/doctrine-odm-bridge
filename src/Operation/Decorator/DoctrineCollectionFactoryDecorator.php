@@ -30,7 +30,7 @@ class DoctrineCollectionFactoryDecorator extends AbstractCollectionFactoryDecora
      * DoctrineCollectionFactoryDecorator constructor.
      *
      * @param CollectionFactoryInterface $collectionFactory
-     * @param DoctrineDocumentManager $documentManager
+     * @param DoctrineDocumentManager    $documentManager
      */
     public function __construct(CollectionFactoryInterface $collectionFactory, DoctrineDocumentManager $documentManager)
     {

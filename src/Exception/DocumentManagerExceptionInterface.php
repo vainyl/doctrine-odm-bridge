@@ -24,5 +24,5 @@ interface DocumentManagerExceptionInterface extends ArrayInterface, \Throwable
     /**
      * @return DocumentManager
      */
-    public function getDocumentManager() : DocumentManager;
+    public function getDocumentManager(): DocumentManager;
 }
