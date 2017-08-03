@@ -20,7 +20,8 @@ services:
       - '@doctrine.event.manager'
       - '@time.factory'
     tags:
-      - {name: doctrine.manager, alias: document}
+      - {name: doctrine.manager, alias: odm}
+      - {name: domain.storage, alias: doctrine.odm}
   doctrine.document.manager.factory:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentManagerFactory
   doctrine.document.metadata.factory:
