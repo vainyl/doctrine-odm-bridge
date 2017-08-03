@@ -34,17 +34,15 @@ services:
   document.operation.factory.doctrine:
     class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
     arguments: ['@collection.factory.sequence', '@doctrine.document.manager']
-    tags:
-      - {name: entity.operation.factory, alias: doctrine.odm}
   app.bootstrapper.doctrine.odm.annotation:
     class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineAnnotationBootstrapper
     tags:
-      - {name: 'bootstrapper'}
+      - {name: bootstrapper}
   app.bootstrapper.doctrine.odm.type:
     class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineTypeBootstrapper
     arguments: ['@time.factory']
     tags:
-      - {name: 'bootstrapper'}
+      - {name: bootstrapper}
   database.factory.doctrine.odm:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineODMDatabaseFactory
     arguments: ['@connection.storage', '@doctrine.event.manager']
@@ -54,6 +52,3 @@ services:
       - '@hydrator.registry'
       - '@domain.storage'
       - '@doctrine.document.metadata.factory'
-    tags:
-      - {name: hydrator, alias: doctrine.odm}
-      - {name: entity.hydrator, alias: doctrine.odm}
