@@ -20,8 +20,8 @@ services:
       - '@doctrine.event.manager'
       - '@time.factory'
     tags:
-      - {name: 'domain.storage', alias: 'doctrine.odm'}
-      - {name: 'doctrine.manager', alias: 'document'}
+      - {name: domain.storage, alias: doctrine.odm}
+      - {name: doctrine.manager, alias: document}
   doctrine.document.manager.factory:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentManagerFactory
   doctrine.document.metadata.factory:
@@ -36,7 +36,8 @@ services:
     class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
     arguments: ['@collection.factory.sequence', '@doctrine.document.manager']
     tags:
-      - {name: 'domain.operation.factory', alias: 'doctrine.odm'}
+      - {name: domain.operation.factory, alias: doctrine.odm}
+      - {name: entity.operation.factory, alias: doctrine.odm}
   app.bootstrapper.doctrine.odm.annotation:
     class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineAnnotationBootstrapper
     tags:
@@ -58,3 +59,4 @@ services:
     tags:
       - {name: hydrator, alias: doctrine.odm}
       - {name: domain.hydrator, alias: doctrine.odm}
+      - {name: entity.hydrator, alias: doctrine.odm}
