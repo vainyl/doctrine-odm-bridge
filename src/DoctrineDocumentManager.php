@@ -72,6 +72,16 @@ class DoctrineDocumentManager extends DocumentManager implements DomainStorageIn
     }
 
     /**
+     * @param DoctrineDocumentManager $obj
+     *
+     * @return bool
+     */
+    public function equals($obj): bool
+    {
+        return $this->getId() === $obj->getId();
+    }
+
+    /**
      * @inheritDoc
      */
     public function findById(string $name, $id): ?DomainInterface
@@ -134,6 +144,14 @@ class DoctrineDocumentManager extends DocumentManager implements DomainStorageIn
     public function getTimeFactory()
     {
         return $this->timeFactory;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hash()
+    {
+        return $this->getId();
     }
 
     /**
