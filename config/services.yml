@@ -34,6 +34,8 @@ services:
   document.operation.factory.doctrine:
     class: Vainyl\Doctrine\ODM\Operation\Factory\DoctrineDocumentOperationFactory
     arguments: ['@collection.factory.sequence', '@doctrine.document.manager']
+    tags:
+      - {name: document.operation.factory, alias: doctrine.odm}
   app.bootstrapper.doctrine.odm.annotation:
     class: Vainyl\Doctrine\ODM\Bootstrapper\DoctrineAnnotationBootstrapper
     tags:
@@ -52,3 +54,5 @@ services:
       - '@hydrator.registry'
       - '@domain.storage'
       - '@doctrine.document.metadata.factory'
+    tags:
+      - {name: document.hydrator, alias: doctrine.odm}
