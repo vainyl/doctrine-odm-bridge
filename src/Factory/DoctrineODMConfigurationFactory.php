@@ -25,7 +25,7 @@ use Vainyl\Doctrine\ODM\Exception\UnknownDoctrineConfigTypeException;
 /**
  * Class DoctrineODMConfigurationFactory
  *
- * @author Nazar Ivanenko <nivanenko@gmail.com>
+ * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
 class DoctrineODMConfigurationFactory extends AbstractIdentifiable
 {

@@ -21,7 +21,7 @@ use Vainyl\Operation\SuccessfulOperationResult;
 /**
  * Class UpsertDoctrineDocumentOperation
  *
- * @author Nazar Ivanenko <nivanenko@gmail.com>
+ * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
 class UpsertDoctrineDocumentOperation extends AbstractOperation
 {

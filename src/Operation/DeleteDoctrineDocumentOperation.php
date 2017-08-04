@@ -21,7 +21,7 @@ use Vainyl\Operation\SuccessfulOperationResult;
 /**
  * Class DeleteDoctrineDocumentOperation
  *
- * @author Nazar Ivanenko <nivanenko@gmail.com>
+ * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
 class DeleteDoctrineDocumentOperation extends AbstractOperation
 {

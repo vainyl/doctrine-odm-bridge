@@ -28,7 +28,7 @@ use Vainyl\Operation\OperationInterface;
 /**
  * Class DoctrineDocumentOperationFactory
  *
- * @author Nazar Ivanenko <nivanenko@gmail.com>
+ * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
 class DoctrineDocumentOperationFactory extends AbstractIdentifiable implements
     DocumentOperationFactoryInterface

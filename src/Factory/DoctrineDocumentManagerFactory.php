@@ -21,7 +21,7 @@ use Vainyl\Time\Factory\TimeFactoryInterface;
 /**
  * Class DoctrineDocumentManagerFactory
  *
- * @author Nazar Ivanenko <nivanenko@gmail.com>
+ * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
 class DoctrineDocumentManagerFactory
 {

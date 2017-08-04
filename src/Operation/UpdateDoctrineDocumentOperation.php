@@ -21,7 +21,7 @@ use Vainyl\Operation\SuccessfulOperationResult;
 /**
  * Class UpdateDoctrineDocumentOperation
  *
- * @author Nazar Ivanenko <nivanenko@gmail.com>
+ * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
 class UpdateDoctrineDocumentOperation extends AbstractOperation
 {
