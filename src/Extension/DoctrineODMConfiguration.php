@@ -32,13 +32,16 @@ class DoctrineODMConfiguration implements ConfigurationInterface
 
         $rootNode
             ->children()
-            ->scalarNode('database')->defaultValue('doctrine')->end()
-            ->scalarNode('config')->defaultValue('yaml')->end()
-            ->scalarNode('file')->defaultValue('entitymap')->end()
-            ->scalarNode('extension')->defaultValue('.odm.yml')->end()
-            ->scalarNode('tmp_dir')->defaultValue('doctrine')->end()
-            ->scalarNode('proxy')->defaultValue('Proxy')->end()
-            ->scalarNode('hydrator')->defaultValue('Hydrator')->end()
+                ->scalarNode('database')->defaultValue('doctrine')->end()
+                ->scalarNode('file')->defaultValue('entitymap')->end()
+                ->scalarNode('extension')->defaultValue('.odm.yml')->end()
+                ->scalarNode('tmp_dir')->defaultValue('doctrine')->end()
+                ->scalarNode('proxy')->defaultValue('Proxy')->end()
+                ->scalarNode('hydrator')->defaultValue('Hydrator')->end()
+                ->arrayNode('decorators')
+                    ->prototype('scalar')->end()
+                    ->defaultValue([])
+                ->end()
             ->end();
 
         return $treeBuilder;

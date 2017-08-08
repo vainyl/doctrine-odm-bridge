@@ -1,16 +1,24 @@
 services:
-  doctrine.settings.odm:
-    class: Vainyl\Doctrine\ODM\Factory\DoctrineODMSettings
-    arguments: ['@doctrine.settings', 'admin', 'yaml', 'entitymap', 'odm.yml', '/tmp', 'Proxy', 'Hydrator']
+  doctrine.settings.document:
+    class: Vainyl\Doctrine\ODM\DoctrineDocumentSettings
+    arguments: ['@doctrine.settings', 'admin', 'entitymap', 'odm.yml', '/tmp', 'Proxy', 'Hydrator']
+  doctrine.mapping.driver.document.factory:
+    class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentMappingDriverFactory
+    arguments: ['@doctrine.mapping.path.provider']
+  doctrine.mapping.driver.document:
+    class: Doctrine\Common\Persistence\Mapping\Driver\MappingDriver
+    factory: ['@doctrine.mapping.driver.document.factory', 'create']
+    arguments:
+      - '@doctrine.settings.document'
   doctrine.configuration.odm:
     class: Doctrine\ODM\MongoDB\Configuration
     factory: ['@doctrine.configuration.factory.odm', 'getConfiguration']
     arguments:
       - '@app.environment'
-      - '@doctrine.settings.odm'
+      - '@doctrine.settings.document'
+      - '@doctrine.mapping.driver.document'
   doctrine.configuration.factory.odm:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineODMConfigurationFactory
-    arguments: ['@bundle.storage']
   doctrine.document.manager:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentManager
     factory: ['@doctrine.document.manager.factory', 'create']

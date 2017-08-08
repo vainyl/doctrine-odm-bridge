@@ -4,7 +4,7 @@
  *
  * PHP Version 7
  *
- * @package   Doctrine
+ * @package   Doctrine-ODM-Bridge
  * @license   https://opensource.org/licenses/MIT MIT License
  * @link      https://vainyl.com
  */
@@ -25,7 +25,7 @@ use Vainyl\Time\Factory\TimeFactoryInterface;
 /**
  * Class DoctrineDocumentManager
  *
- * @author Nazar Ivanenko <nivanenko@gmail.com>
+ * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
 class DoctrineDocumentManager extends DocumentManager implements DomainStorageInterface
 {
@@ -107,7 +107,11 @@ class DoctrineDocumentManager extends DocumentManager implements DomainStorageIn
      */
     public function findOne(string $name, array $criteria = [], array $orderBy = []): ?DomainInterface
     {
-        return array_pop($this->getRepository($name)->findBy($criteria, $orderBy, 1));
+        if ([] === ($result = $this->getRepository($name)->findBy($criteria, $orderBy, 1))) {
+            return null;
+        }
+
+        return current($result);
     }
 
     /**
