@@ -7,9 +7,9 @@ services:
     arguments: ['@doctrine.mapping.path.provider']
   doctrine.mapping.driver.document:
     class: Doctrine\Common\Persistence\Mapping\Driver\MappingDriver
-    factory: ['@doctrine.mapping.driver.entity.factory', 'create']
+    factory: ['@doctrine.mapping.driver.document.factory', 'create']
     arguments:
-      - '@doctrine.settings.entity'
+      - '@doctrine.settings.document'
   doctrine.configuration.odm:
     class: Doctrine\ODM\MongoDB\Configuration
     factory: ['@doctrine.configuration.factory.odm', 'getConfiguration']
