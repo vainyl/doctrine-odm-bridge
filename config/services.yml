@@ -1,5 +1,5 @@
 services:
-  doctrine.settings.odm:
+  doctrine.settings.document:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentSettings
     arguments: ['@doctrine.settings', 'admin', 'entitymap', 'odm.yml', '/tmp', 'Proxy', 'Hydrator']
   doctrine.mapping.driver.document.factory:
@@ -15,7 +15,7 @@ services:
     factory: ['@doctrine.configuration.factory.odm', 'getConfiguration']
     arguments:
       - '@app.environment'
-      - '@doctrine.settings.odm'
+      - '@doctrine.settings.document'
       - '@doctrine.mapping.driver.document'
   doctrine.configuration.factory.odm:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineODMConfigurationFactory
