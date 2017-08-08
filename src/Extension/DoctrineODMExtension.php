@@ -29,7 +29,7 @@ class DoctrineODMExtension extends AbstractFrameworkExtension
      */
     public function getCompilerPasses(): array
     {
-        return [new DoctrineDocumentMappingDriverPass()];
+        return [[new DoctrineDocumentMappingDriverPass()]];
     }
 
     /**
