@@ -19,6 +19,8 @@ use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Vainyl\Doctrine\ODM\Exception\LevelIntegrityException;
 use Vainyl\Domain\DomainInterface;
+use Vainyl\Domain\Scenario\ScenarioInterface;
+use Vainyl\Domain\Scenario\Storage\DomainScenarioStorageInterface;
 use Vainyl\Domain\Storage\DomainStorageInterface;
 use Vainyl\Time\Factory\TimeFactoryInterface;
 
@@ -27,7 +29,7 @@ use Vainyl\Time\Factory\TimeFactoryInterface;
  *
  * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
-class DoctrineDocumentManager extends DocumentManager implements DomainStorageInterface
+class DoctrineDocumentManager extends DocumentManager implements DomainStorageInterface, DomainScenarioStorageInterface
 {
     /**
      * @var TimeFactoryInterface
@@ -184,5 +186,13 @@ class DoctrineDocumentManager extends DocumentManager implements DomainStorageIn
         }
 
         return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getScenarios(string $name): array
+    {
+        return $this->getMetadataFactory()->getMetadataFor($name)->getScenarios();
     }
 }
