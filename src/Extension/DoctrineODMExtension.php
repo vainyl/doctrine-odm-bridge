@@ -41,12 +41,11 @@ class DoctrineODMExtension extends AbstractFrameworkExtension
         $container
             ->findDefinition('doctrine.settings.odm')
             ->replaceArgument(1, $odmConfig['database'])
-            ->replaceArgument(2, $odmConfig['config'])
-            ->replaceArgument(3, $odmConfig['file'])
-            ->replaceArgument(4, $odmConfig['extension'])
-            ->replaceArgument(5, $odmConfig['tmp_dir'])
-            ->replaceArgument(6, $odmConfig['proxy'])
-            ->replaceArgument(7, $odmConfig['hydrator']);
+            ->replaceArgument(2, $odmConfig['file'])
+            ->replaceArgument(3, $odmConfig['extension'])
+            ->replaceArgument(4, $odmConfig['tmp_dir'])
+            ->replaceArgument(5, $odmConfig['proxy'])
+            ->replaceArgument(6, $odmConfig['hydrator']);
 
         foreach ($odmConfig['decorators'] as $decorator) {
             $decoratorId = 'doctrine.mapping.driver.' . $decorator;
