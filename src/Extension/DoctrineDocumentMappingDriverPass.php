@@ -36,7 +36,7 @@ class DoctrineDocumentMappingDriverPass implements CompilerPassInterface
             }
             $definition = (clone $container->getDefinition($decoratorId))
                 ->setDecoratedService('doctrine.mapping.driver.document')
-                ->clearTag('driver.decorator')
+                ->clearTag('mapping.driver.decorator')
                 ->replaceArgument(0, new Reference($decoratorId . '.document.inner'));
             $container->setDefinition($decoratorId . '.document', $definition);
         }
