@@ -17,9 +17,9 @@ use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadataFactory;
 use Doctrine\ODM\MongoDB\Types\Type;
-use Vainyl\Core\ArrayInterface;
 use Vainyl\Core\Hydrator\AbstractHydrator;
 use Vainyl\Core\Hydrator\Registry\HydratorRegistryInterface;
+use Vainyl\Core\IdentifiableInterface;
 use Vainyl\Doctrine\ODM\Exception\MissingDiscriminatorColumnException;
 use Vainyl\Doctrine\ODM\Exception\UnknownDiscriminatorValueException;
 use Vainyl\Doctrine\ODM\Exception\UnknownReferenceEntityException;
@@ -60,7 +60,7 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
     /**
      * @inheritDoc
      */
-    public function doCreate(string $name, array $documentData = []): ArrayInterface
+    public function doCreate(string $name, array $documentData = []): IdentifiableInterface
     {
         /**
          * @var ClassMetadata     $classMetadata
@@ -134,7 +134,7 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
     /**
      * @inheritDoc
      */
-    public function doUpdate($document, array $documentData): ArrayInterface
+    public function doUpdate($document, array $documentData): IdentifiableInterface
     {
         /**
          * @var ClassMetadata     $classMetadata

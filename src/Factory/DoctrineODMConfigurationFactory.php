@@ -47,6 +47,7 @@ class DoctrineODMConfigurationFactory extends AbstractIdentifiable
         $config->setMetadataDriverImpl($driver);
         $config->setMetadataCacheImpl($settings->getCache());
         $config->setAutoGenerateProxyClasses($environment->isDebugEnabled());
+        $config->setClassMetadataFactoryName(DoctrineDocumentMetadataFactory::class);
 
         return $config;
     }
