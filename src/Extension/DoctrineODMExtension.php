@@ -32,14 +32,14 @@ class DoctrineODMExtension extends AbstractFrameworkExtension
     {
         parent::load($configs, $container);
 
-        if (false === $container->hasDefinition('doctrine.settings.odm')) {
-            throw new MissingRequiredServiceException($container, 'doctrine.settings.odm');
+        if (false === $container->hasDefinition('doctrine.settings.document')) {
+            throw new MissingRequiredServiceException($container, 'doctrine.settings.document');
         }
 
         $configuration = new DoctrineODMConfiguration();
         $odmConfig = $this->processConfiguration($configuration, $configs);
         $container
-            ->findDefinition('doctrine.settings.odm')
+            ->findDefinition('doctrine.settings.document')
             ->replaceArgument(1, $odmConfig['database'])
             ->replaceArgument(2, $odmConfig['file'])
             ->replaceArgument(3, $odmConfig['extension'])
