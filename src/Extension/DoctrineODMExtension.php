@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Vainyl\Doctrine\ODM\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Vainyl\Core\Exception\MissingRequiredServiceException;
 use Vainyl\Core\Extension\AbstractExtension;
 use Vainyl\Core\Extension\AbstractFrameworkExtension;
@@ -46,6 +47,18 @@ class DoctrineODMExtension extends AbstractFrameworkExtension
             ->replaceArgument(5, $odmConfig['tmp_dir'])
             ->replaceArgument(6, $odmConfig['proxy'])
             ->replaceArgument(7, $odmConfig['hydrator']);
+
+        foreach ($odmConfig['decorators'] as $decorator) {
+            $decoratorId = 'doctrine.mapping.driver.' . $decorator;
+            if (false === $container->hasDefinition($decoratorId)) {
+                throw new MissingRequiredServiceException($container, $decoratorId);
+            }
+            $definition = (clone $container->getDefinition($decoratorId))
+                ->setDecoratedService('doctrine.mapping.driver.document')
+                ->clearTag('driver.decorator')
+                ->replaceArgument(0, new Reference($decoratorId . '.document.inner'));
+            $container->setDefinition($decoratorId . '.document', $definition);
+        }
 
         return $this;
     }
