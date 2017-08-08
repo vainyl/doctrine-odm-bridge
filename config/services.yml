@@ -1,7 +1,7 @@
 services:
   doctrine.settings.odm:
     class: Vainyl\Doctrine\ODM\DoctrineDocumentSettings
-    arguments: ['@doctrine.settings', 'admin', 'yaml', 'entitymap', 'odm.yml', '/tmp', 'Proxy', 'Hydrator']
+    arguments: ['@doctrine.settings', 'admin', 'entitymap', 'odm.yml', '/tmp', 'Proxy', 'Hydrator']
   doctrine.mapping.driver.document.factory:
     class: Vainyl\Doctrine\ODM\Factory\DoctrineDocumentMappingDriverFactory
     arguments: ['@doctrine.mapping.path.provider']

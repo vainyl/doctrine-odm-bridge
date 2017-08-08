@@ -38,7 +38,6 @@ class DoctrineDocumentSettings extends DoctrineSettings
      *
      * @param DoctrineSettings $doctrineSettings
      * @param string           $databaseName
-     * @param string           $driverName
      * @param string           $globalFileName
      * @param string           $fileExtension
      * @param string           $tmpDir
@@ -48,7 +47,6 @@ class DoctrineDocumentSettings extends DoctrineSettings
     public function __construct(
         DoctrineSettings $doctrineSettings,
         string $databaseName,
-        string $driverName,
         string $globalFileName,
         string $fileExtension,
         string $tmpDir,
@@ -61,7 +59,11 @@ class DoctrineDocumentSettings extends DoctrineSettings
         $this->tmpDir = $tmpDir;
         $this->proxyNamespace = $proxyNamespace;
         $this->hydratorNamespace = $hydratorNamespace;
-        parent::__construct($doctrineSettings->getCache(), $doctrineSettings->getDriverName(), $doctrineSettings->getExtraPaths());
+        parent::__construct(
+            $doctrineSettings->getCache(),
+            $doctrineSettings->getDriverName(),
+            $doctrineSettings->getExtraPaths()
+        );
     }
 
     /**
