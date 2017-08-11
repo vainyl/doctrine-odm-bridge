@@ -27,6 +27,7 @@ services:
       - '@doctrine.configuration.odm'
       - '@doctrine.event.manager'
       - '@time.factory'
+      - '@domain.metadata.factory'
     tags:
       - {name: doctrine.manager, alias: odm}
       - {name: domain.storage, alias: doctrine.odm}
