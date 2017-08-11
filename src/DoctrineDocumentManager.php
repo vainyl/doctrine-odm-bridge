@@ -19,7 +19,7 @@ use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Vainyl\Doctrine\ODM\Exception\LevelIntegrityException;
 use Vainyl\Domain\DomainInterface;
-use Vainyl\Domain\Scenario\ScenarioInterface;
+use Vainyl\Domain\Metadata\Factory\DomainMetadataFactoryInterface;
 use Vainyl\Domain\Scenario\Storage\DomainScenarioStorageInterface;
 use Vainyl\Domain\Storage\DomainStorageInterface;
 use Vainyl\Time\Factory\TimeFactoryInterface;
@@ -31,46 +31,50 @@ use Vainyl\Time\Factory\TimeFactoryInterface;
  */
 class DoctrineDocumentManager extends DocumentManager implements DomainStorageInterface, DomainScenarioStorageInterface
 {
-    /**
-     * @var TimeFactoryInterface
-     */
     private $timeFactory;
+
+    private $domainMetadataFactory;
 
     private $flushLevel = 0;
 
     /**
      * DoctrineDocumentManager constructor.
      *
-     * @param Connection           $conn
-     * @param Configuration        $config
-     * @param EventManager         $eventManager
-     * @param TimeFactoryInterface $timeFactory
+     * @param Connection                     $conn
+     * @param Configuration                  $config
+     * @param EventManager                   $eventManager
+     * @param TimeFactoryInterface           $timeFactory
+     * @param DomainMetadataFactoryInterface $domainMetadataFactory
      */
     protected function __construct(
         Connection $conn,
         Configuration $config,
         EventManager $eventManager,
-        TimeFactoryInterface $timeFactory
+        TimeFactoryInterface $timeFactory,
+        DomainMetadataFactoryInterface $domainMetadataFactory
     ) {
         $this->timeFactory = $timeFactory;
+        $this->domainMetadataFactory = $domainMetadataFactory;
         parent::__construct($conn, $config, $eventManager);
     }
 
     /**
-     * @param                      $conn
-     * @param Configuration        $config
-     * @param EventManager         $eventManager
-     * @param TimeFactoryInterface $timeFactory
+     * @param mixed                          $conn
+     * @param Configuration                  $config
+     * @param EventManager                   $eventManager
+     * @param TimeFactoryInterface           $timeFactory
+     * @param DomainMetadataFactoryInterface $domainMetadataFactory
      *
      * @return DoctrineDocumentManager
      */
-    public static function createWithTimeFactory(
+    public static function createExtended(
         $conn,
         Configuration $config,
         EventManager $eventManager,
-        TimeFactoryInterface $timeFactory
+        TimeFactoryInterface $timeFactory,
+        DomainMetadataFactoryInterface $domainMetadataFactory
     ) {
-        return new DoctrineDocumentManager($conn, $config, $eventManager, $timeFactory);
+        return new DoctrineDocumentManager($conn, $config, $eventManager, $timeFactory, $domainMetadataFactory);
     }
 
     /**
@@ -137,11 +141,27 @@ class DoctrineDocumentManager extends DocumentManager implements DomainStorageIn
     }
 
     /**
+     * @return DomainMetadataFactoryInterface
+     */
+    public function getDomainMetadataFactory(): DomainMetadataFactoryInterface
+    {
+        return $this->domainMetadataFactory;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getId(): ?string
     {
         return spl_object_hash($this);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getScenarios(string $name): array
+    {
+        return $this->getMetadataFactory()->getMetadataFor($name)->getDomainMetadata()->getScenarios();
     }
 
     /**
@@ -186,13 +206,5 @@ class DoctrineDocumentManager extends DocumentManager implements DomainStorageIn
         }
 
         return true;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getScenarios(string $name): array
-    {
-        return $this->getMetadataFactory()->getMetadataFor($name)->getScenarios();
     }
 }

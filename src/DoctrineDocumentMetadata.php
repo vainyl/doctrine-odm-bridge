@@ -14,6 +14,7 @@ namespace Vainyl\Doctrine\ODM;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Vainyl\Doctrine\Common\Metadata\DoctrineDomainMetadataInterface;
+use Vainyl\Domain\Metadata\DomainMetadataInterface;
 
 /**
  * Class DoctrineDocumentMetadata
@@ -22,51 +23,33 @@ use Vainyl\Doctrine\Common\Metadata\DoctrineDomainMetadataInterface;
  */
 class DoctrineDocumentMetadata extends ClassMetadata implements DoctrineDomainMetadataInterface
 {
-    public $alias;
+    public $domainMetadata;
 
-    public $scenarios;
+    /**
+     * DoctrineEntityMetadata constructor.
+     *
+     * @param string                  $documentName
+     * @param DomainMetadataInterface $domainMetadata
+     */
+    public function __construct($documentName, DomainMetadataInterface $domainMetadata)
+    {
+        $this->domainMetadata = $domainMetadata;
+        parent::__construct($documentName);
+    }
 
     /**
      * @inheritDoc
      */
     public function __sleep()
     {
-        return array_merge(parent::__sleep(), ['alias', 'scenarios']);
+        return array_merge(parent::__sleep(), ['domainMetadata']);
     }
 
     /**
      * @inheritDoc
      */
-    public function getAlias(): string
+    public function getDomainMetadata(): DomainMetadataInterface
     {
-        return $this->alias;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setAlias(string $alias): DoctrineDomainMetadataInterface
-    {
-        $this->alias = $alias;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getScenarios(): array
-    {
-        return $this->scenarios;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setScenarios(array $scenarios): DoctrineDomainMetadataInterface
-    {
-        $this->scenarios = $scenarios;
-
-        return $this;
+        return $this->domainMetadata;
     }
 }
