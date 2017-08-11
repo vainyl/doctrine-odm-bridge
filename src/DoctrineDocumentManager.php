@@ -18,6 +18,7 @@ use Doctrine\MongoDB\Connection;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Vainyl\Doctrine\ODM\Exception\LevelIntegrityException;
+use Vainyl\Doctrine\ODM\Factory\DoctrineDocumentMetadataFactory;
 use Vainyl\Domain\DomainInterface;
 use Vainyl\Domain\Metadata\Factory\DomainMetadataFactoryInterface;
 use Vainyl\Domain\Scenario\Storage\DomainScenarioStorageInterface;
@@ -28,6 +29,8 @@ use Vainyl\Time\Factory\TimeFactoryInterface;
  * Class DoctrineDocumentManager
  *
  * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
+ *
+ * @method DoctrineDocumentMetadataFactory getMetadataFactory
  */
 class DoctrineDocumentManager extends DocumentManager implements DomainStorageInterface, DomainScenarioStorageInterface
 {
@@ -200,11 +203,9 @@ class DoctrineDocumentManager extends DocumentManager implements DomainStorageIn
     public function supports(string $name): bool
     {
         try {
-            $this->getMetadataFactory()->getMetadataFor($name);
+            return $this->getMetadataFactory()->getMetadataFor($name)->getDomainMetadata()->isPrimary();
         } catch (MappingException $e) {
             return false;
         }
-
-        return true;
     }
 }

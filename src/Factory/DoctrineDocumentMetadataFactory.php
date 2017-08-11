@@ -21,6 +21,8 @@ use Vainyl\Doctrine\ODM\DoctrineDocumentMetadata;
  * Class DoctrineDocumentMetadataFactory
  *
  * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
+ *
+ * @method DoctrineDocumentMetadata getMetadataFor($className)
  */
 class DoctrineDocumentMetadataFactory extends ClassMetadataFactory
 {
