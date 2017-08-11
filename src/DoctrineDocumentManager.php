@@ -200,11 +200,9 @@ class DoctrineDocumentManager extends DocumentManager implements DomainStorageIn
     public function supports(string $name): bool
     {
         try {
-            $this->getMetadataFactory()->getMetadataFor($name);
+            return $this->getMetadataFactory()->getMetadataFor($name)->getDomainMetadata()->isPrimary();
         } catch (MappingException $e) {
             return false;
         }
-
-        return true;
     }
 }
