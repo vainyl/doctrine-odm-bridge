@@ -14,9 +14,9 @@ namespace Vainyl\Doctrine\ODM\Operation\Decorator;
 
 use Vainyl\Core\ResultInterface;
 use Vainyl\Doctrine\ODM\DoctrineDocumentManager;
+use Vainyl\Doctrine\ODM\Operation\Result\DoctrineOdmFailedResult;
 use Vainyl\Operation\Collection\CollectionInterface;
 use Vainyl\Operation\Collection\Decorator\AbstractCollectionDecorator;
-use Vainyl\Operation\FailedOperationResult;
 
 /**
  * Class DoctrineCollectionDecorator
@@ -54,7 +54,7 @@ class DoctrineCollectionDecorator extends AbstractCollectionDecorator
 
             $this->documentManager->flush();
         } catch (\Exception $exception) {
-            return new FailedOperationResult($this);
+            return new DoctrineOdmFailedResult($exception);
         }
 
         return $result;
