@@ -20,7 +20,8 @@ use Vainyl\Core\Exception\AbstractCoreException;
  *
  * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
  */
-abstract class AbstractDocumentManagerException extends AbstractCoreException implements DocumentManagerExceptionInterface
+abstract class AbstractDocumentManagerException extends AbstractCoreException implements
+    DocumentManagerExceptionInterface
 {
     private $documentManager;
 
@@ -30,13 +31,13 @@ abstract class AbstractDocumentManagerException extends AbstractCoreException im
      * @param DocumentManager $documentManager
      * @param string          $message
      * @param int             $code
-     * @param \Exception|null $previous
+     * @param \Throwable|null $previous
      */
     public function __construct(
         DocumentManager $documentManager,
         string $message,
         int $code = 500,
-        \Exception $previous = null
+        \Throwable $previous = null
     ) {
         $this->documentManager = $documentManager;
         parent::__construct($message, $code, $previous);
