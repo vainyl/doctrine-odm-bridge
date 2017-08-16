@@ -13,13 +13,12 @@ declare(strict_types=1);
 namespace Vainyl\Doctrine\ODM\Exception;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Vainyl\Core\ArrayInterface;
+use Vainyl\Core\Exception\CoreExceptionInterface;
 
 /**
  * Interface DocumentManagerExceptionInterface
- * @package Vainyl\Doctrine\ODM\Exception
  */
-interface DocumentManagerExceptionInterface extends ArrayInterface, \Throwable
+interface DocumentManagerExceptionInterface extends CoreExceptionInterface
 {
     /**
      * @return DocumentManager
