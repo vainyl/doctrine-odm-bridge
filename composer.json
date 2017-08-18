@@ -15,12 +15,12 @@
     "require": {
         "php": ">=7.1",
         "doctrine/mongodb-odm": "^1.1",
-        "vainyl/core": "dev-master",
-        "vainyl/doctrine-common-bridge": "dev-master",
-        "vainyl/document": "dev-master",
-        "vainyl/mongo": "dev-master",
-        "vainyl/operation": "dev-master",
-        "vainyl/time": "dev-master"
+        "vainyl/core": "0.2.x-dev",
+        "vainyl/doctrine-common-bridge": "0.2.x-dev",
+        "vainyl/document": "0.2.x-dev",
+        "vainyl/mongo": "0.2.x-dev",
+        "vainyl/operation": "0.2.x-dev",
+        "vainyl/time": "0.2.x-dev"
     },
     "repositories": [
         {
@@ -29,9 +29,9 @@
         }
     ],
     "provide": {
-        "vain/database": "dev-master",
-        "vain/document": "dev-master",
-        "vain/domain": "dev-master"
+        "vain/database": "^0.2",
+        "vain/document": "^0.2",
+        "vain/domain": "^0.2"
     },
     "prefer-stable": true,
     "minimum-stability": "dev"
