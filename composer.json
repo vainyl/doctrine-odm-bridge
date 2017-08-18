@@ -28,6 +28,11 @@
             "url": "https://satis.vainyl.com:444"
         }
     ],
+    "provide": {
+        "vain/database": "^0.1",
+        "vain/document": "^0.1",
+        "vain/domain": "^0.1"
+    },
     "prefer-stable": true,
     "minimum-stability": "dev"
 }
