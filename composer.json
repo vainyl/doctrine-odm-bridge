@@ -29,9 +29,9 @@
         }
     ],
     "provide": {
-        "vain/database": "^0.1",
-        "vain/document": "^0.1",
-        "vain/domain": "^0.1"
+        "vain/database": "dev-master",
+        "vain/document": "dev-master",
+        "vain/domain": "dev-master"
     },
     "prefer-stable": true,
     "minimum-stability": "dev"
