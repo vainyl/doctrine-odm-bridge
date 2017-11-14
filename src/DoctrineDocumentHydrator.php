@@ -31,6 +31,7 @@ use Vainyl\Domain\Storage\DomainStorageInterface;
  * Class DoctrineDocumentHydrator
  *
  * @author Taras P. Girnyk <taras.p.gyrnik@gmail.com>
+ * @author Andrii Dembitskiy <andrew.dembitskiy@gmail.com>
  */
 class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydratorInterface
 {
@@ -102,7 +103,7 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                             );
                             break;
                         case ClassMetadata::EMBED_MANY:
-                            $processedValue = [];
+                            $processedValue = new ArrayCollection();
                             foreach ($value as $singleDocument) {
                                 $processedValue[] = $this->hydratorRegistry->getHydrator($referenceEntity)->create(
                                     $referenceEntity,
@@ -150,7 +151,29 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                     $associationMapping = $classMetadata->associationMappings[$field];
                     $referenceEntity = $associationMapping['targetDocument'];
                     $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
+
                     switch ($associationMapping['association']) {
+                        case ClassMetadata::REFERENCE_ONE:
+                            if ($value === null) {
+                                break;
+                            }
+
+                            if (null === ($processedValue = $this->domainStorage->findOne($referenceEntity, $value))) {
+                                throw new UnknownReferenceEntityException($this, $referenceEntity, $value);
+                            }
+                            break;
+                        case ClassMetadata::REFERENCE_MANY:
+                            $processedValue = new ArrayCollection();
+                            foreach ($value as $referenceData) {
+                                if (null === ($reference = $this->domainStorage->findOne(
+                                        $referenceEntity,
+                                        $referenceData
+                                    ))) {
+                                    throw new UnknownReferenceEntityException($this, $referenceEntity, $referenceData);
+                                }
+                                $processedValue->add($reference);
+                            }
+                            break;
                         case ClassMetadata::EMBED_ONE:
                             $processedValue = $this->hydratorRegistry->getHydrator($referenceEntity)->create(
                                 $referenceEntity,
@@ -158,7 +181,7 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                             );
                             break;
                         case ClassMetadata::EMBED_MANY:
-                            $processedValue = [];
+                            $processedValue = new ArrayCollection();
                             foreach ($value as $singleDocument) {
                                 $processedValue[] = $this->hydratorRegistry->getHydrator($referenceEntity)->create(
                                     $referenceEntity,
@@ -191,6 +214,8 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
      * @param ClassMetadata $classMetadata
      *
      * @return string
+     * @throws MissingDiscriminatorColumnException
+     * @throws UnknownDiscriminatorValueException
      */
     public function getDocumentName(array $documentData, ClassMetadata $classMetadata): string
     {
