@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Vainyl\Doctrine\ODM\Bootstrapper;
 
-use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Vainyl\Core\AbstractIdentifiable;
 use Vainyl\Core\Application\ApplicationInterface;
 use Vainyl\Core\Application\BootstrapperInterface;
@@ -37,7 +37,7 @@ class DoctrineAnnotationBootstrapper extends AbstractIdentifiable implements Boo
      */
     public function process(ApplicationInterface $application): BootstrapperInterface
     {
-        AnnotationDriver::registerAnnotationClasses();
+        AnnotationRegistry::registerLoader('class_exists');
 
         return $this;
     }
