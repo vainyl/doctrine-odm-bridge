@@ -69,6 +69,9 @@ class UpdateDoctrineDocumentOperation extends AbstractOperation
      */
     public function execute(): ResultInterface
     {
+        $this->documentManager->detach($this->oldDocument);
+        $this->documentManager->persist($this->newDocument);
+
         return new SuccessfulOperationResult($this);
     }
 }
