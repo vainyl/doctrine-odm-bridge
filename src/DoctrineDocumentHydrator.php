@@ -54,8 +54,8 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
         ClassMetadataFactory $metadataFactory
     ) {
         $this->hydratorRegistry = $registry;
-        $this->domainStorage = $domainStorage;
-        $this->metadataFactory = $metadataFactory;
+        $this->domainStorage    = $domainStorage;
+        $this->metadataFactory  = $metadataFactory;
     }
 
     /**
@@ -67,17 +67,22 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
          * @var ClassMetadata     $classMetadata
          * @var DocumentInterface $document
          */
-        $documentName = $this->getDocumentName($documentData, $this->metadataFactory->getMetadataFor($name));
+        $documentName  = $this->getDocumentName($documentData, $this->metadataFactory->getMetadataFor($name));
         $classMetadata = $this->metadataFactory->getMetadataFor($documentName);
-        $document = $classMetadata->newInstance();
+        $document      = $classMetadata->newInstance();
+
+        $missedAssociations = $classMetadata->associationMappings;
 
         foreach ($documentData as $field => $value) {
             $reflectionField = $processedValue = null;
             switch (true) {
-                case array_key_exists($field, $classMetadata->associationMappings):
+                case $classMetadata->hasAssociation($field):
                     $associationMapping = $classMetadata->associationMappings[$field];
-                    $referenceEntity = $associationMapping['targetDocument'];
-                    $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
+                    $referenceEntity    = $classMetadata->getAssociationTargetClass($field);
+                    $reflectionField    = $classMetadata->getReflectionProperty($associationMapping['fieldName']);
+
+                    unset($missedAssociations[$field]);
+
                     switch ($associationMapping['association']) {
                         case ClassMetadata::REFERENCE_ONE:
                             if (null === ($processedValue = $this->domainStorage->findOne($referenceEntity, $value))) {
@@ -115,10 +120,10 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                             break;
                     }
                     break;
-                case array_key_exists($field, $classMetadata->fieldMappings):
-                    $fieldMapping = $classMetadata->fieldMappings[$field];
-                    $processedValue = Type::getType($fieldMapping['type'])->convertToPHPValue($value);
-                    $reflectionField = $classMetadata->reflFields[$fieldMapping['fieldName']];
+                case $classMetadata->hasField($field):
+                    $fieldMapping    = $classMetadata->getFieldMapping($field);
+                    $processedValue  = Type::getType($classMetadata->getTypeOfField($field))->convertToPHPValue($value);
+                    $reflectionField = $classMetadata->getReflectionProperty($fieldMapping['fieldName']);
 
                     break;
                 default:
@@ -128,6 +133,8 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                 $reflectionField->setValue($document, $processedValue);
             }
         }
+
+        $this->fillEmptyCollectionOnManyAssociations($missedAssociations, $classMetadata, $document);
 
         return $document;
     }
@@ -147,10 +154,10 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
         foreach ($documentData as $field => $value) {
             $reflectionField = $processedValue = null;
             switch (true) {
-                case array_key_exists($field, $classMetadata->associationMappings):
+                case $classMetadata->hasAssociation($field):
                     $associationMapping = $classMetadata->associationMappings[$field];
-                    $referenceEntity = $associationMapping['targetDocument'];
-                    $reflectionField = $classMetadata->reflFields[$associationMapping['fieldName']];
+                    $referenceEntity    = $classMetadata->getAssociationTargetClass($field);
+                    $reflectionField    = $classMetadata->getReflectionProperty($associationMapping['fieldName']);
 
                     switch ($associationMapping['association']) {
                         case ClassMetadata::REFERENCE_ONE:
@@ -193,10 +200,11 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
                             break;
                     }
                     break;
-                case array_key_exists($field, $classMetadata->fieldMappings):
-                    $fieldMapping = $classMetadata->fieldMappings[$field];
-                    $processedValue = Type::getType($fieldMapping['type'])->convertToPHPValue($value);
-                    $reflectionField = $classMetadata->reflFields[$fieldMapping['fieldName']];
+                case $classMetadata->hasField($field):
+                    $fieldMapping    = $classMetadata->getFieldMapping($field);
+                    $processedValue  = Type::getType($classMetadata->getTypeOfField($field))->convertToPHPValue($value);
+                    $reflectionField = $classMetadata->getReflectionProperty($fieldMapping['fieldName']);
+
                     break;
                 default:
                     break;
@@ -217,9 +225,12 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
      * @throws MissingDiscriminatorColumnException
      * @throws UnknownDiscriminatorValueException
      */
-    public function getDocumentName(array $documentData, ClassMetadata $classMetadata): string
+    private function getDocumentName(array $documentData, ClassMetadata $classMetadata): string
     {
-        if (ClassMetadata::INHERITANCE_TYPE_NONE === $classMetadata->inheritanceType) {
+        if (ClassMetadata::INHERITANCE_TYPE_NONE === $classMetadata->inheritanceType
+            ||
+            null !== $classMetadata->discriminatorValue
+        ) {
             return $classMetadata->name;
         }
 
@@ -232,7 +243,10 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
         }
 
         $discriminatorColumnValue = $documentData[$classMetadata->discriminatorField];
-        if (false === array_key_exists($discriminatorColumnValue, $classMetadata->discriminatorMap)) {
+        if (false === array_key_exists($discriminatorColumnValue, $classMetadata->discriminatorMap)
+            &&
+            null === ($discriminatorColumnValue = $classMetadata->defaultDiscriminatorValue)
+        ) {
             throw new UnknownDiscriminatorValueException(
                 $this,
                 $discriminatorColumnValue,
@@ -255,5 +269,29 @@ class DoctrineDocumentHydrator extends AbstractHydrator implements DomainHydrato
         }
 
         return true;
+    }
+
+    /**
+     * @param array         $missedAssociations
+     * @param ClassMetadata $classMetadata
+     * @param               $document
+     */
+    private function fillEmptyCollectionOnManyAssociations(
+        array $missedAssociations,
+        ClassMetadata $classMetadata,
+        $document
+    ): void {
+        foreach ($missedAssociations as $missedAssociationMeta) {
+            switch ($missedAssociationMeta['association']) {
+                case ClassMetadata::REFERENCE_MANY:
+                case ClassMetadata::EMBED_MANY:
+                    $classMetadata->setFieldValue(
+                        $document,
+                        $missedAssociationMeta['fieldName'],
+                        new ArrayCollection()
+                    );
+                    break;
+            }
+        }
     }
 }
